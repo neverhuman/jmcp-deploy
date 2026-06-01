@@ -28,6 +28,10 @@ is_jmcp_root_process() {
   cwd="$(readlink -f "/proc/${pid}/cwd" 2>/dev/null || true)"
   exe="$(readlink -f "/proc/${pid}/exe" 2>/dev/null || true)"
 
+  if [[ "$comm" == "jmcpd" ]] && is_under_repo "$exe"; then
+    return 0
+  fi
+
   case "$args" in
     *"$repo_root/target/"*"/jmcpd"*|*"$repo_root/apps/jmcpd"*)
       { is_under_repo "$cwd" || is_under_repo "$exe"; } && return 0
