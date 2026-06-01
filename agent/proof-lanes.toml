@@ -1,60 +1,99 @@
-version = 1
-system = "JMCP"
 protocol = "JCP/1.0.0"
+system = "JMCP"
 transport_profile = "JPCM"
+version = 1
 
 [[lane]]
+evidence = [
+    "docs/architecture.md",
+    "contracts/events/",
+    "paper/jmcp-v1-architecture-security-reproducibility.tex",
+]
 id = "architecture"
-evidence = [
-  "docs/architecture.md",
-  "paper/jmcp-v1-architecture-security-reproducibility.tex"
-]
 required_claims = [
-  "local production-shaped core",
-  "embedded SQLite default",
-  "in-process replayable event bus default",
-  "Rust backend",
-  "React dashboard",
-  "Rust TUI",
-  "Telegram text intake/approvals",
-  "local Jankurai/Jeryu/Jekko adapters"
+    "local production-shaped core",
+    "embedded SQLite default",
+    "in-process replayable event bus default",
+    "Rust backend",
+    "React dashboard",
+    "Rust TUI",
+    "Telegram text intake/approvals",
+    "local Jankurai/Jeryu/Jekko adapters",
 ]
 
 [[lane]]
+evidence = [
+    "apps/web/",
+    "docs/screenshots/",
+    "agent/ux-qa.toml",
+]
+id = "rendered-ux"
+required_claims = [
+    "rendered UX proof host",
+    "Playwright screenshot capture",
+    "accessibility checks",
+    "reuse of the live cockpit UI",
+]
+
+[[lane]]
+evidence = [
+    "docs/protocol-decisions.md",
+    "agent/test-map.json",
+]
 id = "protocol"
-evidence = [
-  "docs/protocol-decisions.md",
-  "agent/test-map.json"
-]
 required_claims = [
-  "JMCP is the system",
-  "JCP/1.0.0 is the protocol",
-  "JPCM is the backbone/transport profile"
+    "JMCP is the system",
+    "JCP/1.0.0 is the protocol",
+    "JPCM is the backbone/transport profile",
 ]
 
 [[lane]]
+evidence = [
+    "docs/security.md",
+    "agent/audit-policy.toml",
+]
 id = "security"
-evidence = [
-  "docs/security.md",
-  "agent/audit-policy.toml"
-]
 required_claims = [
-  "approval gates for mutating operations",
-  "audit records are non-secret",
-  "replay does not duplicate side effects",
-  "adapters cannot bypass policy"
+    "approval gates for mutating operations",
+    "audit records are non-secret",
+    "replay does not duplicate side effects",
+    "adapters cannot bypass policy",
 ]
 
 [[lane]]
-id = "reproducibility"
 evidence = [
-  "docs/testing.md",
-  "docs/operations.md",
-  "agent/generated-zones.toml"
+    "docs/testing.md",
+    "docs/operations.md",
+    "agent/generated-zones.toml",
 ]
+id = "reproducibility"
 required_claims = [
-  "CI-local parity",
-  "deterministic fixtures",
-  "local defaults do not require remote services"
+    "CI-local parity",
+    "deterministic fixtures",
+    "local defaults do not require remote services",
 ]
 
+[[lane]]
+command = "just fast"
+name = "fast"
+purpose = "deterministic local health proof"
+
+[[lane]]
+command = "just score"
+name = "audit"
+purpose = "produce jankurai score artifacts"
+
+[[lane]]
+command = "just contract-drift"
+name = "contract-drift"
+purpose = "boundary manifest, generated-contract routing, and public API drift checks"
+
+[[lane]]
+command = "just security"
+name = "security"
+purpose = "secret, dependency, and workflow proof"
+
+[[lane]]
+command = "just check"
+name = "release"
+purpose = "full merge gate"

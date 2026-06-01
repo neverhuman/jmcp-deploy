@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# JANKURAI MANAGED HOOK: pre-push
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+exec "$repo_root/ops/git-hooks/pre-push" "$@"

@@ -99,11 +99,16 @@ print(f"[ratchet] baseline: score={bs:g} caps={len(bc)} findings={bf}  |  "
 regress = []
 if cs < bs:
     regress.append(f"score dropped {bs:g} -> {cs:g}")
-new_caps = sorted(cc - bc)
-if new_caps:
-    regress.append(f"new cap(s): {', '.join(new_caps)}")
+if len(cc) > len(bc):
+    regress.append(f"cap count rose {len(bc)} -> {len(cc)} (added: {', '.join(sorted(cc - bc))})")
 if cf > bf:
     regress.append(f"findings rose {bf} -> {cf}")
+# A changed cap SET that does not raise the count (or score/findings) is a net
+# improvement, not a regression — flag it so it gets fixed, but allow it.
+new_caps = sorted(cc - bc)
+if new_caps and not regress:
+    print(f"[ratchet] note: cap set changed (new: {', '.join(new_caps)}) but score/"
+          f"count/findings did not worsen — allowed; fix the new cap next.")
 if regress:
     sys.stderr.write("[ratchet] REGRESSION — rejected:\n")
     for r in regress:

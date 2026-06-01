@@ -1,60 +1,170 @@
 {
-  "version": 1,
-  "system": "JMCP",
-  "minimum_bar": "CI-local parity with deterministic unit, integration, replay, protocol, security, and operations tests.",
   "lanes": [
     {
       "id": "unit",
-      "scope": "Pure Rust modules and React utility surfaces",
       "must_prove": [
         "protocol envelope validation",
         "event serialization round trips",
         "approval state transitions",
         "adapter error classification"
-      ]
+      ],
+      "scope": "Pure Rust modules and React utility surfaces"
     },
     {
       "id": "integration-local",
-      "scope": "Local process with embedded SQLite and in-process event bus",
       "must_prove": [
         "cold start",
         "SQLite migration application",
         "event publish and replay",
         "approval persistence",
         "dashboard/TUI API contract compatibility"
-      ]
+      ],
+      "scope": "Local process with embedded SQLite and in-process event bus"
     },
     {
       "id": "protocol",
-      "scope": "JCP/1.0.0 over JPCM",
       "must_prove": [
         "schema acceptance for valid envelopes",
         "schema rejection for malformed envelopes",
         "correlation id propagation",
         "idempotency key handling",
         "transport profile invariants"
-      ]
+      ],
+      "scope": "JCP/1.0.0 over JPCM"
     },
     {
       "id": "security",
-      "scope": "Secrets, approvals, audit, and adapter boundaries",
       "must_prove": [
         "no secret values in logs or audit exports",
         "mutating operations require approval",
         "adapter cannot bypass policy",
         "replay cannot duplicate committed side effects"
-      ]
+      ],
+      "scope": "Secrets, approvals, audit, and adapter boundaries"
     },
     {
       "id": "reproducibility",
-      "scope": "Developer and CI-local parity",
       "must_prove": [
         "documented commands work locally",
         "fixtures are committed or generated from declared zones",
         "tests do not depend on remote services by default",
         "paper claims map to tests or design decisions"
-      ]
+      ],
+      "scope": "Developer and CI-local parity"
     }
-  ]
+  ],
+  "minimum_bar": "CI-local parity with deterministic unit, integration, replay, protocol, security, and operations tests.",
+  "system": "JMCP",
+  "tests": {
+    "AGENTS.md": {
+      "command": "just score",
+      "purpose": "verify root routing remains visible to the audit"
+    },
+    ".agents/": {
+      "command": "just score",
+      "purpose": "verify generated agent scaffolding stays routed and reviewable"
+    },
+    ".artifacts/": {
+      "command": "just score",
+      "purpose": "verify generated artifacts remain outside the authored surface"
+    },
+    "README-jankurai-scaffold.md": {
+      "command": "jankurai doctor --fail-on critical",
+      "purpose": "verify scaffold marker does not hide missing control-plane files"
+    },
+    "agent/": {
+      "command": "just score",
+      "purpose": "verify manifests remain parseable and authoritative"
+    },
+    "agent/coverage-sources.toml": {
+      "command": "jankurai coverage audit . --config agent/coverage-sources.toml --json target/jankurai/coverage/coverage-audit.json --md target/jankurai/coverage/coverage-audit.md && just score",
+      "purpose": "verify coverage evidence source routing and score import"
+    },
+    "agent/zyal/": {
+      "command": "just score",
+      "purpose": "verify canonical ZYAL runbooks stay under agent/zyal and only use the .zyal extension"
+    },
+    "apps/": {
+      "command": "just fast",
+      "purpose": "verify app surfaces remain routed through the audit"
+    },
+    "apps/web/": {
+      "command": "npm --prefix apps/web run test:ux",
+      "purpose": "verify the rendered UX proof host and accessibility checks"
+    },
+    "contracts/": {
+      "command": "jankurai audit . --mode advisory --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
+      "purpose": "advisory contract drift scan until project-specific contract checks exist"
+    },
+    "contracts/events/": {
+      "command": "just contract-drift",
+      "purpose": "verify event contract sources stay in the declared surface"
+    },
+    "agent/repo-score-baseline.json": {
+      "command": "just score",
+      "purpose": "verify the committed score baseline stays aligned with audit policy"
+    },
+    "crates/": {
+      "command": "just fast",
+      "purpose": "verify Rust behavior and audit checks"
+    },
+    "crates/jankurai/src/audit/coverage.rs": {
+      "command": "jankurai coverage audit . --config agent/coverage-sources.toml --json target/jankurai/coverage/coverage-audit.json --md target/jankurai/coverage/coverage-audit.md && just score",
+      "purpose": "verify coverage parsers and evidence normalization"
+    },
+    "crates/jankurai/src/commands/coverage.rs": {
+      "command": "jankurai coverage audit . --config agent/coverage-sources.toml --json target/jankurai/coverage/coverage-audit.json --md target/jankurai/coverage/coverage-audit.md && just score",
+      "purpose": "verify coverage audit command behavior"
+    },
+    "crates/jankurai/tests/fixtures/coverage/": {
+      "command": "jankurai coverage audit . --config agent/coverage-sources.toml --json target/jankurai/coverage/coverage-audit.json --md target/jankurai/coverage/coverage-audit.md",
+      "purpose": "verify coverage parser fixture contracts"
+    },
+    "db/": {
+      "command": "jankurai doctor --fail-on critical",
+      "purpose": "advisory database boundary health check"
+    },
+    "db/constraints/": {
+      "command": "jankurai doctor --fail-on critical",
+      "purpose": "advisory constraint-lane health check until DB proof exists"
+    },
+    "db/migrations/": {
+      "command": "jankurai doctor --fail-on critical",
+      "purpose": "advisory control-plane health check until migration tests exist"
+    },
+    "docs/": {
+      "command": "just score",
+      "purpose": "verify agent-readable documentation remains routed"
+    },
+    "docs/COVERAGE_*.md": {
+      "command": "just score",
+      "purpose": "verify coverage evidence docs remain routed"
+    },
+    "docs/architecture/": {
+      "command": "jankurai audit . --mode advisory --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
+      "purpose": "verify architecture docs remain visible to the audit"
+    },
+    "docs/decisions/": {
+      "command": "jankurai audit . --mode advisory --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
+      "purpose": "verify decision records remain visible to the audit"
+    },
+    "examples/perfect-web-api-db/backend/src/background_job.rs": {
+      "command": "just fast",
+      "purpose": "run proofs for background‑job cell"
+    },
+    "ops/": {
+      "command": "just fast",
+      "purpose": "verify ops surfaces remain visible to the audit"
+    },
+    "schemas/coverage-*.schema.json": {
+      "command": "just score",
+      "purpose": "verify coverage evidence schemas and fixtures"
+    },
+    "tools/": {
+      "command": "just fast",
+      "purpose": "verify Rust behavior and audit checks"
+    }
+  },
+  "version": 1,
+  "workspace": "jankurai"
 }
-
