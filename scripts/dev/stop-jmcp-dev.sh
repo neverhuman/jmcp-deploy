@@ -8,6 +8,16 @@ if [[ "${1:-}" == "--dry-run" ]]; then
   dry_run=1
 fi
 
+is_under_repo() {
+  local path="$1"
+  [[ "$path" == "$repo_root" || "$path" == "$repo_root/"* ]]
+}
+
+is_under_cockpit() {
+  local path="$1"
+  [[ "$path" == "$repo_root/apps/cockpit" || "$path" == "$repo_root/apps/cockpit/"* ]]
+}
+
 is_jmcp_root_process() {
   local pid="$1"
   local comm="$2"
@@ -20,13 +30,16 @@ is_jmcp_root_process() {
 
   case "$args" in
     *"$repo_root/target/"*"/jmcpd"*|*"$repo_root/apps/jmcpd"*)
-      [[ "$cwd" == "$repo_root"* || "$exe" == "$repo_root"* ]] && return 0
+      { is_under_repo "$cwd" || is_under_repo "$exe"; } && return 0
       ;;
-    *"npm --workspace @jmcp/cockpit run dev"*|*"npm run dev"*)
-      [[ "$cwd" == "$repo_root"* || "$cwd" == "$repo_root/apps/cockpit"* ]] && return 0
+    *"npm --workspace @jmcp/cockpit run dev"*)
+      is_under_repo "$cwd" && return 0
+      ;;
+    *"npm run dev"*)
+      is_under_cockpit "$cwd" && return 0
       ;;
     *"sh -c vite"*|*"node $repo_root/node_modules/.bin/vite"*)
-      [[ "$cwd" == "$repo_root/apps/cockpit"* ]] && return 0
+      is_under_cockpit "$cwd" && return 0
       ;;
   esac
 
@@ -60,7 +73,11 @@ while [[ "$changed" -eq 1 ]]; do
   done
 done
 
-mapfile -t candidates < <(printf '%s\n' "${!candidate_by_pid[@]}" | sort -n)
+if [[ "${#candidate_by_pid[@]}" -eq 0 ]]; then
+  candidates=()
+else
+  mapfile -t candidates < <(printf '%s\n' "${!candidate_by_pid[@]}" | sort -n)
+fi
 
 if [[ "${#candidates[@]}" -eq 0 ]]; then
   printf 'No JMCP-owned dev processes found.\n'
