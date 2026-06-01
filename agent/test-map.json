@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "system": "JMCP",
+  "minimum_bar": "CI-local parity with deterministic unit, integration, replay, protocol, security, and operations tests.",
+  "lanes": [
+    {
+      "id": "unit",
+      "scope": "Pure Rust modules and React utility surfaces",
+      "must_prove": [
+        "protocol envelope validation",
+        "event serialization round trips",
+        "approval state transitions",
+        "adapter error classification"
+      ]
+    },
+    {
+      "id": "integration-local",
+      "scope": "Local process with embedded SQLite and in-process event bus",
+      "must_prove": [
+        "cold start",
+        "SQLite migration application",
+        "event publish and replay",
+        "approval persistence",
+        "dashboard/TUI API contract compatibility"
+      ]
+    },
+    {
+      "id": "protocol",
+      "scope": "JCP/1.0.0 over JPCM",
+      "must_prove": [
+        "schema acceptance for valid envelopes",
+        "schema rejection for malformed envelopes",
+        "correlation id propagation",
+        "idempotency key handling",
+        "transport profile invariants"
+      ]
+    },
+    {
+      "id": "security",
+      "scope": "Secrets, approvals, audit, and adapter boundaries",
+      "must_prove": [
+        "no secret values in logs or audit exports",
+        "mutating operations require approval",
+        "adapter cannot bypass policy",
+        "replay cannot duplicate committed side effects"
+      ]
+    },
+    {
+      "id": "reproducibility",
+      "scope": "Developer and CI-local parity",
+      "must_prove": [
+        "documented commands work locally",
+        "fixtures are committed or generated from declared zones",
+        "tests do not depend on remote services by default",
+        "paper claims map to tests or design decisions"
+      ]
+    }
+  ]
+}
+
