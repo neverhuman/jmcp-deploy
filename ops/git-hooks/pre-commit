@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Reject commits that regress jankurai conformance (score/caps/hard-findings).
+# Bypass attempts via --no-verify are still caught by the CI ratchet gate.
+set -Eeuo pipefail
+exec "$(git rev-parse --show-toplevel)/ops/ci/jankurai-ratchet.sh"
