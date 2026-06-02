@@ -28,7 +28,11 @@ fi
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 CUR="$WORK/repo-score.json"
-"$JANKURAI" audit . --mode "$MODE" --json "$CUR" --md "$WORK/repo-score.md" >/dev/null 2>&1 \
+# --full forces a complete (non-incremental) scan. Without it, jankurai's
+# [smart] mode may decide "no changes" against an unrelated cache and skip
+# writing the --json report (→ FileNotFound) or emit a partial score; --full
+# makes the ratchet deterministic and reproducible on every checkout/runner.
+"$JANKURAI" audit . --mode "$MODE" --full --json "$CUR" --md "$WORK/repo-score.md" >/dev/null 2>&1 \
   || { echo "[ratchet] jankurai audit failed to run" >&2; exit 1; }
 
 # Write/refresh the compact baseline summary from a full audit report.
