@@ -52,6 +52,7 @@ Abort a lane as soon as one of these happens:
 
 When a proof fails, write down the exact rerun command and the artifact path that explains the failure. Preferred receipts are the existing local artifacts:
 
+- `.jankurai/repo-score.json` and `.jankurai/repo-score.md` for ad hoc local score review
 - `target/jankurai/repo-score.json`
 - `target/jankurai/repo-score.md`
 - `target/jankurai/security/evidence.json`
