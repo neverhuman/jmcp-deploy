@@ -6,6 +6,11 @@ source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 cd "$ROOT_DIR"
 
 status=0
+JANKURAI="${JANKURAI_BIN:-jankurai}"
+
+if ! command -v "$JANKURAI" >/dev/null 2>&1; then
+  fail "jankurai not found: $JANKURAI"
+fi
 
 run_step() {
   local name="$1"
@@ -32,7 +37,7 @@ run_step_soft() {
 }
 
 run_step "jankurai: audit" \
-  jankurai audit . \
+  "$JANKURAI" audit . \
     --mode advisory \
     --json target/jankurai/repo-score.json \
     --md target/jankurai/repo-score.md \
@@ -45,30 +50,30 @@ run_step "jankurai: audit" \
 # this repo declares for audit proof-binding, so it is best-effort and must not
 # redden the workflow. (Reconcile proof-lanes.toml schema separately.)
 run_step_soft "jankurai: proof routing" \
-  jankurai proof . \
+  "$JANKURAI" proof . \
     --changed-from origin/main \
     --out target/jankurai/proof-routing.json \
     --md target/jankurai/proof-routing.md
 
 run_step "jankurai: regression ratchet" \
-  bash ops/ci/jankurai-ratchet.sh
+  env JANKURAI_BIN="$JANKURAI" bash ops/ci/jankurai-ratchet.sh
 
 run_step "jankurai: proofbind verify" \
-  jankurai proofbind verify . --changed-from origin/main
+  "$JANKURAI" proofbind verify . --changed-from origin/main
 
 run_step "jankurai: proofmark rust" \
-  jankurai proofmark rust . --obligations target/jankurai/proofbind/obligations.json
+  "$JANKURAI" proofmark rust . --obligations target/jankurai/proofbind/obligations.json
 
 run_step "jankurai: copy-code" \
-  jankurai copy-code . \
+  "$JANKURAI" copy-code . \
     --json target/jankurai/copy-code.json \
     --md target/jankurai/copy-code.md
 
 run_step "jankurai: rust witness build" \
-  jankurai rust witness build .
+  "$JANKURAI" rust witness build .
 
 run_step "jankurai: security evidence" \
-  jankurai security run \
+  "$JANKURAI" security run \
     --script ops/ci/security.sh \
     --out target/jankurai/security/evidence.json
 
@@ -94,7 +99,7 @@ if [[ -f apps/web/package.json ]]; then
   fi
   if [[ -f packages/ux-qa/dist/cli.js ]]; then
     run_step "jankurai: UX QA smoke" \
-      jankurai ux audit --config agent/ux-qa.toml --out target/jankurai/ux-qa.json
+      "$JANKURAI" ux audit --config agent/ux-qa.toml --out target/jankurai/ux-qa.json
   else
     warn "jankurai: skipping UX QA smoke; packages/ux-qa not built (build it for parity)"
   fi
@@ -109,7 +114,7 @@ run_step "jankurai: release readiness" \
   bash ops/ci/release-readiness.sh
 
 run_step "jankurai: agent tool supply receipt" \
-  jankurai audit . \
+  "$JANKURAI" audit . \
     --mode advisory \
     --json target/jankurai/agent-tool-supply.json \
     --md target/jankurai/agent-tool-supply.md
