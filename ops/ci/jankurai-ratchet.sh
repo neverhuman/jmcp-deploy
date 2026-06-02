@@ -28,11 +28,31 @@ fi
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 CUR="$WORK/repo-score.json"
+# Audit a CLEAN snapshot of the COMMITTED+STAGED state (HEAD + index) rather
+# than the live working tree. `git write-tree` materializes the index as a tree;
+# `git archive` of that tree carries HEAD plus anything staged, but EXCLUDES
+# unstaged edits and untracked files. This makes the ratchet reproducible — a
+# co-worker's uncommitted WIP in the shared checkout can no longer cross-block
+# (or mask) this run. Falls back to auditing `.` if this is not a git repo or
+# write-tree fails (e.g. detached/bare edge cases).
+SNAP="."
+if git rev-parse --git-dir >/dev/null 2>&1; then
+  TREE="$(git write-tree 2>/dev/null)" || TREE=""
+  if [[ -n "$TREE" ]]; then
+    SNAP="$WORK/snapshot"
+    mkdir -p "$SNAP"
+    if ! { git archive --format=tar "$TREE" | tar -x -C "$SNAP"; }; then
+      echo "[ratchet] snapshot failed; auditing working tree instead" >&2
+      SNAP="."
+    fi
+  fi
+fi
+
 # --full forces a complete (non-incremental) scan. Without it, jankurai's
 # [smart] mode may decide "no changes" against an unrelated cache and skip
 # writing the --json report (→ FileNotFound) or emit a partial score; --full
 # makes the ratchet deterministic and reproducible on every checkout/runner.
-"$JANKURAI" audit . --mode "$MODE" --full --json "$CUR" --md "$WORK/repo-score.md" >/dev/null 2>&1 \
+"$JANKURAI" audit "$SNAP" --mode "$MODE" --full --json "$CUR" --md "$WORK/repo-score.md" >/dev/null 2>&1 \
   || { echo "[ratchet] jankurai audit failed to run" >&2; exit 1; }
 
 # Write/refresh the compact baseline summary from a full audit report.
