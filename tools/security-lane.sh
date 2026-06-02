@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-set -euo pipefail
-# Scaffold stub: replace with real secret/dependency/SBOM checks before treating this lane as proof.
-echo "security-lane scaffold requires project-specific checks" >&2
-exit 2
+set -Eeuo pipefail
+
+# tools/security-lane.sh is the canonical security wrapper for Jankurai.
+# It delegates to the maintained lane that runs gitleaks detect, cargo audit,
+# npm audit, zizmor workflow linting, and syft SBOM generation when available.
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+exec "$ROOT_DIR/ops/ci/security.sh"

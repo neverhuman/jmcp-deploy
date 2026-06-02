@@ -1,0 +1,24 @@
+schema_version = "1.0.0"
+system = "JMCP"
+default_external_spend_usd = 0
+default_network_spend_usd = 0
+kill_switch_env = "JMCP_COST_KILL_SWITCH"
+kill_switch_value = "1"
+receipt_path = "target/jankurai/cost-budget.json"
+
+[quota_caps]
+local_ci_minutes = 60
+external_api_usd = 0
+telegram_paid_usd = 0
+model_api_usd = 0
+
+[[allowed_exception]]
+name = "operator-approved-release"
+requires = "written release approval and updated receipt"
+max_usd = 0
+
+[stop_conditions]
+on_missing_receipt = true
+on_unknown_paid_tool = true
+on_quota_exceeded = true
+on_kill_switch = true

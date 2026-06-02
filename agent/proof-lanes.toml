@@ -57,7 +57,7 @@ required_claims = [
     "approval gates for mutating operations",
     "audit records are non-secret",
     "replay does not duplicate side effects",
-    "adapters cannot bypass policy",
+    "adapters route all effects through policy.",
 ]
 
 [[lane]]
