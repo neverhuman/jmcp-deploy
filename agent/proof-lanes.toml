@@ -23,6 +23,112 @@ required_claims = [
 
 [[lane]]
 evidence = [
+    "docs/architecture.md",
+    "docs/operations.md",
+    "docs/testing.md",
+    "crates/jmcp-conformance/tests/jcp_v1.rs",
+]
+id = "voice-text-intake"
+required_claims = [
+    "voice/text intake",
+    "Telegram text intake/approvals",
+    "user.message.received",
+    "voice.turn.started",
+    "voice.turn.transcribed",
+    "voice.intent.confirmed",
+    "voice.turn.ended",
+]
+
+[[lane]]
+evidence = [
+    "docs/architecture.md",
+    "docs/operations.md",
+    "docs/testing.md",
+]
+id = "attention-inbox"
+required_claims = [
+    "attention inbox",
+    "user.attention.requested",
+    "attention.candidate",
+    "attention.packet",
+    "attention.escalation",
+    "attention.resolution",
+    "attention.false_quiet_alarm",
+]
+
+[[lane]]
+evidence = [
+    "docs/architecture.md",
+    "docs/testing.md",
+    "schemas/jcp/1.0.0/jcp.schema.json",
+    "crates/jmcp-conformance/tests/jcp_v1.rs",
+]
+id = "memory-promotion"
+required_claims = [
+    "memory promotion",
+    "memory.proposed",
+    "memory.accepted",
+    "memory.rejected",
+    "memory.decayed",
+    "memory.contradiction_detected",
+]
+
+[[lane]]
+evidence = [
+    "docs/architecture.md",
+    "docs/operations.md",
+    "schemas/jcp/1.0.0/jcp.schema.json",
+    "schemas/jpcm/1.0.0/jpcm.schema.json",
+]
+id = "inventory-cards"
+required_claims = [
+    "inventory cards",
+    "tool.card.published",
+    "data.card.published",
+    "agent.card.published",
+    "service.card.declared",
+]
+
+[[lane]]
+evidence = [
+    "docs/architecture.md",
+    "docs/operations.md",
+    "docs/testing.md",
+    "schemas/jcp/1.0.0/jcp.schema.json",
+    "schemas/jpcm/1.0.0/jpcm.schema.json",
+]
+id = "incident-quarantine"
+required_claims = [
+    "incident/quarantine state",
+    "incident.opened",
+    "incident.updated",
+    "incident.resolved",
+    "tool.call.quarantined",
+    "tool_build.quarantined",
+    "policy.lesson.quarantined",
+    "policy.lesson.promoted",
+    "disaster.mode.entered",
+    "disaster.mode.exited",
+]
+
+[[lane]]
+evidence = [
+    "docs/testing.md",
+    "crates/jmcp-conformance/src/lib.rs",
+    "crates/jmcp-conformance/tests/jcp_v1.rs",
+]
+id = "adversarial-cases"
+required_claims = [
+    "prompt injection",
+    "tool poisoning",
+    "memory poisoning",
+    "voice replay",
+    "false evidence",
+    "CI forgery",
+]
+
+[[lane]]
+evidence = [
     "apps/web/",
     "docs/screenshots/",
     "agent/ux-qa.toml",

@@ -6,7 +6,7 @@ JMCP V1 tests must prove that the local default is production-shaped, determinis
 
 ## Proof Lanes
 
-The audit-facing lane map is kept in `agent/proof-lanes.toml`. The test map in `agent/test-map.json` routes each owned surface to the command that proves it.
+The audit-facing lane map is kept in `agent/proof-lanes.toml`. The test map in `agent/test-map.json` routes each owned surface to the command that proves it. The current proof surface includes voice/text intake, the attention inbox, memory promotion, inventory cards, incident/quarantine state, and adversarial cases.
 
 ## Required Lanes
 
@@ -18,9 +18,20 @@ The audit-facing lane map is kept in `agent/proof-lanes.toml`. The test map in `
 - **Reproducibility:** Prove committed fixtures and generated zones are sufficient to reproduce claims locally.
 - **Rendered UX:** Prove the live cockpit UI and the `apps/web` proof host with Playwright screenshots and accessibility checks.
 
+## Control-Plane Proofs
+
+- **Voice/Text intake:** prove text intake, voice turn lifecycle, and approval routing with deterministic fixtures.
+- **Attention inbox:** prove decision-worthy packets, escalation, resolution, and false quiet alarms.
+- **Memory promotion:** prove proposed, accepted, rejected, decayed, and contradiction-detected memory records.
+- **Inventory cards:** prove tool, data, agent, and service card publication records.
+- **Incident/quarantine state:** prove incident opened/updated/resolved records and quarantined records for tool calls, tool builds, and policy lessons.
+- **Adversarial cases:** prove deterministic negative fixtures for prompt injection, tool poisoning, memory poisoning, voice replay, false evidence, and CI forgery.
+
 ## Fixture Rules
 
 Fixtures should be small, explicit, and deterministic. Time, ids, and external responses should be controlled by test harnesses. Telegram and local adapters should default to fake/local drivers in tests unless a separate opt-in external lane is declared.
+
+The `jmcp-conformance` crate owns the canonical deterministic adversarial fixtures for prompt injection, tool poisoning, memory poisoning, voice replay, false evidence, and CI forgery. Those fixtures should stay stable across local and CI runs so proof receipts remain comparable.
 
 ## Cost Budgets
 

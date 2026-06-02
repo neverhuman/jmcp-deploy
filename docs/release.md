@@ -26,7 +26,7 @@ Release is the result of a clean local proof set, not a separate ceremony.
 
 1. Run the full local proof set.
 2. Inspect `target/jankurai/repo-score.json`, `target/jankurai/repo-score.md`, and the lane receipts before cutting a release.
-3. Confirm the advisory score is strictly better than the committed baseline and that no new caps were introduced.
+3. Confirm the advisory score is strictly better than the committed baseline, that no new caps were introduced, and that the conformance suite still passes the deterministic adversarial fixtures for prompt injection, tool poisoning, memory poisoning, voice replay, false evidence, and CI forgery.
 4. Update `CHANGELOG.md` with the user-facing delta.
 5. Tag the release from the reviewed commit only after the proof artifacts are stable.
 

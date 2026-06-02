@@ -156,6 +156,14 @@
       "command": "just score",
       "purpose": "verify manifests remain parseable and authoritative"
     },
+    "agent/audit-policy.toml": {
+      "command": "just score",
+      "purpose": "verify structured runtime and control-plane event policy remains routed"
+    },
+    "agent/proof-lanes.toml": {
+      "command": "just score",
+      "purpose": "verify proof-lane coverage stays aligned with the control-plane proof surface"
+    },
     "GEMINI.md": {
       "command": "just score",
       "purpose": "verify Gemini-facing instructions remain routed"
@@ -171,6 +179,18 @@
     "docs/architecture.md": {
       "command": "just score",
       "purpose": "verify architecture claims remain routed"
+    },
+    "docs/operations.md": {
+      "command": "just score",
+      "purpose": "verify operations guidance remains routed"
+    },
+    "docs/testing.md": {
+      "command": "just score",
+      "purpose": "verify testing guidance and adversarial fixture coverage remain routed"
+    },
+    "docs/release.md": {
+      "command": "just score",
+      "purpose": "verify release gate guidance remains routed"
     },
     "docs/architecture/README.md": {
       "command": "just score",
@@ -267,6 +287,14 @@
     "crates/": {
       "command": "just fast",
       "purpose": "verify Rust behavior and audit checks"
+    },
+    "crates/jmcp-conformance/src/lib.rs": {
+      "command": "just conformance",
+      "purpose": "verify deterministic conformance fixtures remain routable"
+    },
+    "crates/jmcp-conformance/tests/jcp_v1.rs": {
+      "command": "just conformance",
+      "purpose": "verify JCP v1 conformance fixtures and adversarial cases remain routable"
     },
     "deny.toml": {
       "command": "just security",
