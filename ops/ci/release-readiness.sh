@@ -14,12 +14,15 @@ from pathlib import Path
 required_files = [
     "CHANGELOG.md",
     "docs/release.md",
+    "docs/release-process.md",
     "docs/testing.md",
     "docs/operations.md",
+    "docs/security.md",
     "agent/cost-budget.toml",
 ]
 missing = [path for path in required_files if not Path(path).exists()]
 release = Path("docs/release.md").read_text()
+release_process = Path("docs/release-process.md").read_text()
 testing = Path("docs/testing.md").read_text()
 required_terms = [
     "just fast",
@@ -30,8 +33,14 @@ required_terms = [
     "just cost-budget",
     "target/jankurai",
     "rollback",
+    "Release process doc",
+    "integrity/provenance",
 ]
-missing_terms = [term for term in required_terms if term not in release and term not in testing]
+missing_terms = [
+    term
+    for term in required_terms
+    if term not in release and term not in release_process and term not in testing
+]
 receipt = {
     "ok": not missing and not missing_terms,
     "required_files": required_files,
