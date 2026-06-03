@@ -64,10 +64,6 @@
       "command": "just score",
       "purpose": "verify governance chat remains routed"
     },
-    "MOCK_TEST_PROOF.md": {
-      "command": "just fast",
-      "purpose": "verify the mock test proof stays routed"
-    },
     "AGENT_WORK_PLAN.md": {
       "command": "just score",
       "purpose": "verify the work plan remains routed"
@@ -196,22 +192,6 @@
       "command": "just score",
       "purpose": "verify release gate guidance remains routed"
     },
-    "docs/release-process.md": {
-      "command": "just release-readiness && just score",
-      "purpose": "verify release process docs remain part of the local proof surface"
-    },
-    "docs/boundaries.md": {
-      "command": "just contract-drift && just score",
-      "purpose": "verify boundary guidance stays aligned with manifests and contract checks"
-    },
-    "docs/generated-zones.md": {
-      "command": "just contract-drift && just score",
-      "purpose": "verify generated-zone guidance stays aligned with generator manifests"
-    },
-    "docs/audit-rubric.md": {
-      "command": "just score",
-      "purpose": "verify audit rule guidance remains agent-readable"
-    },
     "docs/architecture/README.md": {
       "command": "just score",
       "purpose": "verify architecture documentation stays routed"
@@ -255,10 +235,6 @@
     "rust-toolchain.toml": {
       "command": "just fast",
       "purpose": "verify the pinned Rust toolchain stays routed"
-    },
-    "schemas/jitux/": {
-      "command": "cargo test -p jmcp-domain jitux --locked && just fast-json && just contract-drift",
-      "purpose": "verify the JITUX Mission Deck frame schema and domain frame contract"
     },
     "schemas/jcp/1.0.0/jcp.schema.json": {
       "command": "just contract-drift",

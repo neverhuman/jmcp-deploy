@@ -1,11 +1,6 @@
 # JMCP Release Gate
 
 Release is the result of a clean local proof set, not a separate ceremony.
-This is the release control surface for version source, changelog, release
-process docs, CI or script evidence, integrity/provenance evidence, and rollback
-guidance.
-
-Release process doc: [docs/release-process.md](release-process.md).
 
 `just score` writes the review snapshot to `.jankurai/`; the release bundle and lane receipts live under `target/jankurai/`.
 
@@ -30,11 +25,8 @@ Run the local proof set in this order:
 9. `npm --workspace @jmcp/cockpit run build`
 10. `npm --prefix apps/web run build`
 11. `npm --prefix apps/web run test:ux`
-12. `just score`
 
 `just release-readiness` is the final release surface check. It validates that this doc, `docs/testing.md`, `docs/operations.md`, and `agent/cost-budget.toml` still describe the same local proof set and receipts.
-
-The step-by-step operator process lives in `docs/release-process.md`.
 
 ## Required Receipts
 
