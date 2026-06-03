@@ -15,7 +15,9 @@ just_has() {
   just --summary 2>/dev/null | tr ' ' '\n' | grep -qx "$1"
 }
 
-if just_has fast; then
+if [[ -f ops/ci/fast.sh ]]; then
+  run bash ops/ci/fast.sh
+elif just_has fast; then
   run just fast
 elif just_has check; then
   run just check
