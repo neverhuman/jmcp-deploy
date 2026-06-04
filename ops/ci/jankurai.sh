@@ -45,6 +45,10 @@ run_step "jankurai: audit" \
     --github-step-summary target/jankurai/summary.md \
     --repair-queue-jsonl target/jankurai/repair-queue.jsonl
 
+mkdir -p .jankurai
+cp target/jankurai/repo-score.json .jankurai/repo-score.json
+cp target/jankurai/repo-score.md .jankurai/repo-score.md
+
 # proof routing is supplementary evidence; its lane schema (`jankurai proof`
 # wants name+command per lane) differs from the evidence/required_claims lanes
 # this repo declares for audit proof-binding, so it is best-effort and must not

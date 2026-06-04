@@ -51,7 +51,7 @@ Keep the release proof bundle local and reviewable:
 
 If a lane produces a supporting receipt elsewhere in `target/jankurai/`, keep it with the bundle and cite it in the release note or repair note.
 
-## Release Flow
+## Release Process
 
 1. Run the required proof set locally.
 2. Review `target/jankurai/repo-score.json` and `target/jankurai/repo-score.md` together with the lane receipts listed above.
