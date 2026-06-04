@@ -11,7 +11,9 @@ if repo_has Cargo.toml && ! has cargo; then
   missing_tool cargo "Rust tests"
 elif cargo_workspace_ready; then
   log "ci: running Rust tests"
-  cargo test --workspace --all-targets
+  cargo_jobs="${CARGO_BUILD_JOBS:-$(nproc 2>/dev/null || printf '2')}"
+  export RUST_TEST_THREADS="${RUST_TEST_THREADS:-$cargo_jobs}"
+  cargo test --workspace --all-targets --locked --jobs "$cargo_jobs"
 elif repo_has Cargo.toml; then
   warn "skipping Rust tests: Cargo workspace metadata is not ready"
 else

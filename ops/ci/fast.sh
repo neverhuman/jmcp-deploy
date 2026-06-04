@@ -46,8 +46,9 @@ if repo_has Cargo.toml && ! has cargo; then
   missing_tool cargo "Rust formatting and checks"
 elif cargo_workspace_ready; then
   log "fast: checking Rust workspace"
+  cargo_jobs="${CARGO_BUILD_JOBS:-$(nproc 2>/dev/null || printf '2')}"
   cargo fmt --all -- --check
-  cargo check --workspace --all-targets
+  cargo check --workspace --all-targets --locked --jobs "$cargo_jobs"
 elif repo_has Cargo.toml; then
   warn "skipping Rust checks: Cargo workspace metadata is not ready"
 else
