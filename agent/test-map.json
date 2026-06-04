@@ -312,6 +312,18 @@
       "command": "jankurai audit . --mode advisory --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
       "purpose": "advisory contract drift scan until project-specific contract checks exist"
     },
+    "contracts/openapi/jmcp-api.openapi.yaml": {
+      "command": "cargo test -p jmcp-api --test openapi_route_coverage --locked",
+      "purpose": "verify the OpenAPI 3.1 contract documents every axum route in crates/jmcp-api/src/routes.rs and declares no extraneous operation (route-coverage)"
+    },
+    "contracts/asyncapi/jmcp-streams.asyncapi.yaml": {
+      "command": "cargo test -p jmcp-api --test openapi_route_coverage --locked",
+      "purpose": "verify the AsyncAPI 3.0 streaming contract declares channels for /events, /plans/:id/stream, and the JITUX SSE/ws surfaces"
+    },
+    "crates/jmcp-api/tests/openapi_route_coverage.rs": {
+      "command": "cargo test -p jmcp-api --test openapi_route_coverage --locked",
+      "purpose": "verify the route-coverage contract test asserts router/OpenAPI parity and the AsyncAPI streaming channels remain documented"
+    },
     "paper/jmcp-v1-architecture-security-reproducibility.tex": {
       "command": "just score",
       "purpose": "verify the final paper source remains routed"
