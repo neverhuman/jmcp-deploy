@@ -55,29 +55,8 @@ fi
 "$JANKURAI" audit "$SNAP" --mode "$MODE" --full --json "$CUR" --md "$WORK/repo-score.md" >/dev/null 2>&1 \
   || { echo "[ratchet] jankurai audit failed to run" >&2; exit 1; }
 
-# Write/refresh the compact baseline summary from a full audit report.
 write_summary() {
-  python3 - "$1" "$2" <<'PY'
-import json, sys
-d = json.load(open(sys.argv[1]))
-sc = d.get("score")
-if isinstance(sc, dict):
-    sc = sc.get("final") or sc.get("value")
-if not isinstance(sc, (int, float)):
-    sc = d.get("raw_score", 0)
-counts = {}
-for f in (d.get("findings") or []):
-    r = f.get("rule") or f.get("rule_id") or "unknown"
-    counts[r] = counts.get(r, 0) + 1
-out = {
-    "score": sc,
-    "raw_score": d.get("raw_score"),
-    "caps_applied": d.get("caps_applied") or [],
-    "rule_counts": dict(sorted(counts.items())),
-}
-json.dump(out, open(sys.argv[2], "w"), indent=2)
-open(sys.argv[2], "a").write("\n")
-PY
+  cargo run -q -p jmcp-ci-tools -- jankurai-summary "$1" "$2"
 }
 
 if [[ "$ACCEPT" == "1" ]]; then
@@ -92,53 +71,4 @@ if [[ ! -f "$BASELINE" ]]; then
   exit 0
 fi
 
-python3 - "$BASELINE" "$CUR" <<'PY'
-import json, sys
-def fields(p):
-    d = json.load(open(p))
-    sc = d.get("score")
-    if isinstance(sc, dict):
-        sc = sc.get("final") or sc.get("value")
-    if not isinstance(sc, (int, float)):
-        sc = d.get("raw_score", 0)
-    caps = set(d.get("caps_applied") or [])
-    # Total findings: a summary baseline carries rule_counts; a full audit
-    # report carries a findings[] array (or decision counts). Compare totals so
-    # both formats line up.
-    rc = d.get("rule_counts")
-    if isinstance(rc, dict) and rc:
-        findings = sum(int(v) for v in rc.values())
-    elif d.get("findings") is not None:
-        findings = len(d["findings"])
-    else:
-        dec = d.get("decision") or {}
-        findings = int(dec.get("finding_count")
-                       or (dec.get("hard_findings") or 0) + (dec.get("soft_findings") or 0))
-    return float(sc), caps, int(findings)
-
-bs, bc, bf = fields(sys.argv[1])
-cs, cc, cf = fields(sys.argv[2])
-print(f"[ratchet] baseline: score={bs:g} caps={len(bc)} findings={bf}  |  "
-      f"current: score={cs:g} caps={len(cc)} findings={cf}")
-regress = []
-if cs < bs:
-    regress.append(f"score dropped {bs:g} -> {cs:g}")
-if len(cc) > len(bc):
-    regress.append(f"cap count rose {len(bc)} -> {len(cc)} (added: {', '.join(sorted(cc - bc))})")
-if cf > bf:
-    regress.append(f"findings rose {bf} -> {cf}")
-# A changed cap SET that does not raise the count (or score/findings) is a net
-# improvement, not a regression — flag it so it gets fixed, but allow it.
-new_caps = sorted(cc - bc)
-if new_caps and not regress:
-    print(f"[ratchet] note: cap set changed (new: {', '.join(new_caps)}) but score/"
-          f"count/findings did not worsen — allowed; fix the new cap next.")
-if regress:
-    sys.stderr.write("[ratchet] REGRESSION — rejected:\n")
-    for r in regress:
-        sys.stderr.write(f"   - {r}\n")
-    sys.stderr.write("[ratchet] fix it, or run `ops/ci/jankurai-ratchet.sh --accept` "
-                     "only if the audit IMPROVED.\n")
-    sys.exit(1)
-print("[ratchet] OK — no jankurai regression")
-PY
+cargo run -q -p jmcp-ci-tools -- jankurai-ratchet "$BASELINE" "$CUR"

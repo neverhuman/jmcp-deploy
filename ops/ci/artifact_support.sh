@@ -115,38 +115,13 @@ write_json_files() {
   sha="$(current_sha)"
   tree="$(git rev-parse HEAD^{tree})"
   generated_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  python3 - "$out_dir" "$entrypoint" "$sha" "$tree" "$generated_at" "$workers" <<'PY'
-import json
-import pathlib
-import subprocess
-import sys
-
-out_dir, entrypoint, sha, tree, generated_at, workers = sys.argv[1:7]
-out = pathlib.Path(out_dir)
-files = subprocess.check_output(["git", "ls-files"], text=True).splitlines()
-(out / "context.json").write_text(json.dumps({
-    "schema_version": 1,
-    "generated_by": "ops/ci/artifact_support.sh",
-    "repo": pathlib.Path.cwd().name,
-    "sha": sha,
-    "tree": tree,
-    "generated_at": generated_at,
-    "workers": int(workers),
-    "ci_entrypoint": entrypoint,
-}, indent=2, sort_keys=True) + "\n")
-(out / "manifest.json").write_text(json.dumps({
-    "schema_version": 1,
-    "sha": sha,
-    "tracked_file_count": len(files),
-    "tracked_files": files,
-}, indent=2, sort_keys=True) + "\n")
-(out / "receipts" / "local-ci.json").write_text(json.dumps({
-    "schema_version": 1,
-    "sha": sha,
-    "entrypoint": entrypoint,
-    "status": "success",
-}, indent=2, sort_keys=True) + "\n")
-PY
+  cargo run -q -p jmcp-ci-tools -- artifact-support-receipts \
+    --out-dir "$out_dir" \
+    --entrypoint "$entrypoint" \
+    --sha "$sha" \
+    --tree "$tree" \
+    --generated-at "$generated_at" \
+    --workers "$workers"
 }
 
 bundle_evidence() {

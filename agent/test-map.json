@@ -328,9 +328,9 @@
       "command": "just score",
       "purpose": "verify the final paper source remains routed"
     },
-    "python/ai-service/AGENTS.md": {
-      "command": "just score",
-      "purpose": "verify the Python service guidance remains routed"
+    "services/speech/": {
+      "command": "cargo check -p jmcp-speechd --locked && just fast",
+      "purpose": "verify the Rust speech daemon scripts and clients remain routed"
     },
     "contracts/events/": {
       "command": "just contract-drift",
