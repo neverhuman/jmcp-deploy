@@ -72,6 +72,10 @@
       "command": "just score",
       "purpose": "verify the work plan remains routed"
     },
+    "GOD_MODE_CODEX.md": {
+      "command": "just score",
+      "purpose": "verify the JMCP agent operating-system plan remains routed"
+    },
     "README.md": {
       "command": "just score",
       "purpose": "verify the workspace readme remains routed"
@@ -151,6 +155,14 @@
     "CLAUDE.md": {
       "command": "just score",
       "purpose": "verify Claude-facing instructions remain routed"
+    },
+    "GOD_MODE_CLAUDE.md": {
+      "command": "just score",
+      "purpose": "verify the Claude source plan remains routed"
+    },
+    "GOD_MODE_FINAL.md": {
+      "command": "just score",
+      "purpose": "verify the final claim queue and coordination plan remain routed"
     },
     "Justfile": {
       "command": "just fast",
@@ -236,6 +248,14 @@
       "command": "just fast",
       "purpose": "verify app surfaces remain routed through the audit"
     },
+    "apps/cockpit/src/runtime-api-guards-platform.ts": {
+      "command": "npm --workspace @jmcp/cockpit run typecheck && npm --workspace @jmcp/cockpit run test -- App.test.tsx",
+      "purpose": "verify cockpit API guards accept the fleet-board and Universe contracts without weakening runtime validation"
+    },
+    "apps/cockpit/src/views-panels.tsx": {
+      "command": "npm --workspace @jmcp/cockpit run typecheck && npm --workspace @jmcp/cockpit run test -- App.test.tsx",
+      "purpose": "verify Universe cards augment live control-plane data with read-only fleet-board observations"
+    },
     "apps/web/": {
       "command": "just ux-qa",
       "purpose": "verify the rendered UX proof host and accessibility checks"
@@ -311,6 +331,10 @@
     "crates/": {
       "command": "just fast",
       "purpose": "verify Rust behavior and audit checks"
+    },
+    "crates/jmcp-api/src/routes_extra.rs": {
+      "command": "cargo test -p jmcp-api fleet_board --jobs 40 && cargo test -p jmcp-api --jobs 40",
+      "purpose": "verify the read-only /fleet-board payload, missing/malformed fallback, and Universe composition remain stable"
     },
     "crates/jmcp-conformance/src/lib.rs": {
       "command": "just conformance",

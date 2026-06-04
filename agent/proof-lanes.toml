@@ -143,6 +143,21 @@ required_claims = [
 
 [[lane]]
 evidence = [
+    "crates/jmcp-api/src/routes_extra.rs",
+    "apps/cockpit/src/runtime-api-guards-platform.ts",
+    "apps/cockpit/src/views-panels.tsx",
+    "apps/cockpit/src/App.test.tsx",
+    "agent/test-map.json",
+]
+id = "fleet-board"
+required_claims = [
+    "read-only fleet-board route",
+    "missing and malformed board payloads degrade without mutating control-plane state",
+    "Universe cockpit cards augment live control-plane data with board observations",
+]
+
+[[lane]]
+evidence = [
     "docs/protocol-decisions.md",
     "agent/test-map.json",
 ]
