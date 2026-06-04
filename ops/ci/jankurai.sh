@@ -73,15 +73,16 @@ run_step "jankurai: rust witness build" \
   "$JANKURAI" rust witness build .
 
 run_step "jankurai: security evidence" \
-  "$JANKURAI" security run \
-    --script ops/ci/security.sh \
-    --out target/jankurai/security/evidence.json
+  bash ops/ci/security.sh
 
 run_step "jankurai: language bad behavior evidence" \
   bash ops/ci/language-bad-behavior.sh
 
 run_step "jankurai: contract drift" \
   bash ops/ci/contract-drift.sh
+
+run_step "jankurai: DB migration analysis" \
+  bash ops/ci/db-migration-analyze.sh
 
 # UX QA proof lanes are best-effort: they GATE locally (where the Playwright
 # browser + the @jankurai/ux-qa build are installed) but degrade gracefully in
