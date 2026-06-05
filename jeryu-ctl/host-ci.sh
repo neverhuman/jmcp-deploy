@@ -53,12 +53,12 @@ fi
 # Split repos can provide ci-fast-push.sh; repos that lack it fall through to
 # their own entrypoint so they still get a real jeryu/ci.
 pick_and_run_ci() {   # cwd must be the worktree; logs chosen entrypoint; returns its rc
-  if [[ -f ops/ci/pr-ci.sh ]]; then
-    echo "[host-ci] entrypoint: bash ops/ci/pr-ci.sh"; bash ops/ci/pr-ci.sh; return $?
-  fi
   if [[ -x ./ci-fast-push.sh ]]; then
     echo "[host-ci] entrypoint: ./ci-fast-push.sh --no-push --ci (WORKERS=${WORKERS:-40})"
     WORKERS="${WORKERS:-40}" ./ci-fast-push.sh --no-push --ci; return $?
+  fi
+  if [[ -f ops/ci/pr-ci.sh ]]; then
+    echo "[host-ci] entrypoint: bash ops/ci/pr-ci.sh"; bash ops/ci/pr-ci.sh; return $?
   fi
   if [[ -f scripts/ci-local.sh ]]; then
     echo "[host-ci] entrypoint: bash scripts/ci-local.sh"; bash scripts/ci-local.sh; return $?
