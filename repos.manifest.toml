@@ -11,8 +11,8 @@ jeryu_slug = "jeryu/jmcp-core"
 profile = "rust-workspace"
 default_branch = "main"
 rollout_wave = 0
-has_jeryu_std = false
-onboarded = false
+has_jeryu_std = true
+onboarded = true
 note = "Backend, data, protocol, MPC/control plane, governance."
 
 [[repo]]
@@ -23,8 +23,8 @@ jeryu_slug = "jeryu/jmcp-web"
 profile = "node-frontend"
 default_branch = "main"
 rollout_wave = 0
-has_jeryu_std = false
-onboarded = false
+has_jeryu_std = true
+onboarded = true
 note = "Jarvis-style frontend, cockpit, JITUX card console, rendered UX."
 
 [[repo]]
@@ -35,8 +35,8 @@ jeryu_slug = "jeryu/jmcp-talk"
 profile = "rust-workspace"
 default_branch = "main"
 rollout_wave = 0
-has_jeryu_std = false
-onboarded = false
+has_jeryu_std = true
+onboarded = true
 note = "Speech runtime, MiniCPM-o 4.5 adapter spike, legacy and deterministic fallback."
 
 [[repo]]
@@ -47,6 +47,6 @@ jeryu_slug = "jeryu/jmcp-deploy"
 profile = "ops"
 default_branch = "main"
 rollout_wave = 0
-has_jeryu_std = false
-onboarded = false
+has_jeryu_std = true
+onboarded = true
 note = "Split-family orchestration, launch scripts, env, health checks, Jeryu/GitHub wiring."

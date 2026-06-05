@@ -1,0 +1,27 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      JMCP_STRICT_TOOLS: "0"
+      JMCP_SPLIT_ROOT: ${{ github.workspace }}
+      JMCP_SPLIT_MANIFEST: ${{ github.workspace }}/repos.manifest.toml
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shell syntax
+        run: while IFS= read -r script; do bash -n "$script"; done < <(find scripts ops jeryu-ctl tools -type f -name '*.sh' | sort)
+      - name: Manifest tests
+        run: python3 -m unittest discover -s tests -p '*_test.py'
+      - name: Offline health
+        run: ops/split/health.sh --offline
+      - name: Launch dry-run
+        run: ops/split/launch.sh --dry-run

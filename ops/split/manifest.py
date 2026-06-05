@@ -10,6 +10,7 @@ import sys
 import tomllib
 
 REQUIRED = {"jmcp-core", "jmcp-web", "jmcp-talk", "jmcp-deploy"}
+REQUIRED_TRUE_FLAGS = ("has_jeryu_std", "onboarded")
 
 
 def load_manifest(path: pathlib.Path) -> dict:
@@ -23,9 +24,13 @@ def load_manifest(path: pathlib.Path) -> dict:
     if missing:
         raise ValueError(f"manifest missing required repos: {', '.join(missing)}")
     for repo in repos:
+        name = str(repo.get("name", "<unknown>"))
         for key in ("path", "name", "github_slug", "jeryu_slug", "default_branch"):
             if not repo.get(key):
-                raise ValueError(f"{repo.get('name', '<unknown>')} missing {key}")
+                raise ValueError(f"{name} missing {key}")
+        for key in REQUIRED_TRUE_FLAGS:
+            if repo.get(key) is not True:
+                raise ValueError(f"{name} must set {key}=true")
     return data
 
 

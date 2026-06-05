@@ -3,27 +3,18 @@ set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
 default:
     @just --list
 
-fast: fast-shell fast-json fast-rust fast-npm fast-actions
+fast: fast-shell fast-json fast-actions
 
 fast-shell:
-    source ops/ci/common.sh; log "fast-shell: checking shell syntax"; while IFS= read -r script; do bash -n "$script"; done < <(find scripts ops/ci -type f -name '*.sh' | sort)
+    source ops/ci/common.sh; log "fast-shell: checking shell syntax"; while IFS= read -r script; do bash -n "$script"; done < <(find scripts ops jeryu-ctl tools -type f -name '*.sh' | sort)
 
 fast-json:
-    source ops/ci/common.sh; log "fast-json: validating JSON"; while IFS= read -r file; do python3 -m json.tool "$file" >/dev/null; done < <(find schemas contracts/events -type f -name '*.json' | sort); python3 -m json.tool package.json >/dev/null; python3 -m json.tool package-lock.json >/dev/null
-
-fast-rust:
-    cargo fmt --all -- --check
-    cargo check --workspace --all-targets --locked
-
-fast-npm:
-    npm ci --ignore-scripts --no-audit --no-fund
-    npm --workspace @jankurai/ux-qa run build
-    npm --workspace @jankurai/ux-qa run test
+    python3 -m json.tool agent/test-map.json >/dev/null
 
 fast-actions:
     source ops/ci/common.sh; if has actionlint; then actionlint; else missing_tool actionlint "GitHub Actions linting"; fi
 
-ci: fast test-rust test-cockpit test-web conformance contract-drift
+ci: fast test launch-dry-run health-offline
 
 security: security-evidence
 
@@ -33,41 +24,17 @@ conformance:
 jankurai-local:
     ./ops/ci/jankurai-local.sh
 
-build: build-rust build-cockpit build-web
+build:
+    @echo "deploy repo has no product build"
 
-build-rust:
-    cargo build --workspace --locked
+test:
+    python3 -m unittest discover -s tests -p '*_test.py'
 
-build-cockpit:
-    npm --workspace @jmcp/cockpit run build
+launch-dry-run:
+    ops/split/launch.sh --dry-run
 
-build-web:
-    npm --prefix apps/web run build
-
-test: test-rust test-cockpit test-web
-
-test-rust:
-    cargo test --workspace --all-targets --locked
-
-test-cockpit:
-    npm --workspace @jmcp/cockpit run test
-
-test-web:
-    npm --prefix apps/web run test:ux
-
-ux-qa: ux-qa-playwright ux-qa-audit
-
-ux-qa-playwright:
-    npm --prefix apps/web run test:ux
-
-ux-qa-audit:
-    jankurai ux audit --config agent/ux-qa.toml --out target/jankurai/ux-qa.json
-
-ux-qa-package-build:
-    npm --workspace @jankurai/ux-qa run build
-
-ux-qa-package-test:
-    npm --workspace @jankurai/ux-qa run test
+health-offline:
+    ops/split/health.sh --offline
 
 score: score-advisory
 
@@ -119,4 +86,4 @@ input-boundary:
 agent-tool-supply:
     jankurai audit . --mode advisory --json .jankurai/repo-score.json --md .jankurai/repo-score.md
 
-check: fast build test security conformance contract-drift ux-qa cost-budget release-readiness score rust-map rust-witness rust-diagnose
+check: fast build test health-offline launch-dry-run security conformance contract-drift cost-budget release-readiness score

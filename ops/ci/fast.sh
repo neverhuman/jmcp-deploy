@@ -8,7 +8,7 @@ cd "$ROOT_DIR"
 log "fast: checking shell syntax"
 while IFS= read -r script; do
   bash -n "$script"
-done < <(find scripts ops/ci -type f -name '*.sh' | sort)
+done < <(find scripts ops jeryu-ctl tools -type f -name '*.sh' | sort)
 
 log "fast: validating JSON files"
 if has node; then

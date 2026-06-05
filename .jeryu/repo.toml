@@ -1,0 +1,7 @@
+schema_version = 1
+repo = "jmcp-deploy"
+profile = "ops"
+default_branch = "main"
+ci_command = "just ci"
+release_lane = "jeryu-ctl/release-promotion.sh"
+

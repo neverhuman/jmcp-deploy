@@ -1,0 +1,6 @@
+schema_version = 1
+repo = "jmcp-deploy"
+mode = "pr_only"
+mutating_effects_require_approval = true
+public_ci_requires_jeryu = false
+
