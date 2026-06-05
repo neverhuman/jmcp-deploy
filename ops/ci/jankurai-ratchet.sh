@@ -48,6 +48,21 @@ if git rev-parse --git-dir >/dev/null 2>&1; then
   fi
 fi
 
+if [[ -f "$SNAP/agent/coverage-sources.toml" ]]; then
+  mkdir -p "$SNAP/target/jankurai/coverage"
+  (
+    cd "$SNAP"
+    cargo run -q --manifest-path "$ROOT/Cargo.toml" -p jmcp-ci-tools -- \
+      mock-coverage \
+      --config agent/coverage-sources.toml \
+      --out target/jankurai/coverage/mock-coverage.json
+    "$JANKURAI" coverage audit . \
+      --config agent/coverage-sources.toml \
+      --json target/jankurai/coverage/coverage-audit.json \
+      --md target/jankurai/coverage/coverage-audit.md
+  ) >/dev/null
+fi
+
 # --full forces a complete (non-incremental) scan. Without it, jankurai's
 # [smart] mode may decide "no changes" against an unrelated cache and skip
 # writing the --json report (→ FileNotFound) or emit a partial score; --full
