@@ -36,6 +36,9 @@ launch-dry-run:
 health-offline:
     ops/split/health.sh --offline
 
+split-smoke:
+    ops/split/smoke.sh
+
 score: score-advisory
 
 score-advisory:
