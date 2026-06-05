@@ -1,0 +1,52 @@
+# repos.manifest.toml - JMCP split-family repository manifest.
+
+schema_version = "1"
+workers = 12
+
+[[repo]]
+path = "/home/ubuntu/jmcp-split/jmcp-core"
+name = "jmcp-core"
+github_slug = "neverhuman/jmcp-core"
+jeryu_slug = "jeryu/jmcp-core"
+profile = "rust-workspace"
+default_branch = "main"
+rollout_wave = 0
+has_jeryu_std = false
+onboarded = false
+note = "Backend, data, protocol, MPC/control plane, governance."
+
+[[repo]]
+path = "/home/ubuntu/jmcp-split/jmcp-web"
+name = "jmcp-web"
+github_slug = "neverhuman/jmcp-web"
+jeryu_slug = "jeryu/jmcp-web"
+profile = "node-frontend"
+default_branch = "main"
+rollout_wave = 0
+has_jeryu_std = false
+onboarded = false
+note = "Jarvis-style frontend, cockpit, JITUX card console, rendered UX."
+
+[[repo]]
+path = "/home/ubuntu/jmcp-split/jmcp-talk"
+name = "jmcp-talk"
+github_slug = "neverhuman/jmcp-talk"
+jeryu_slug = "jeryu/jmcp-talk"
+profile = "rust-workspace"
+default_branch = "main"
+rollout_wave = 0
+has_jeryu_std = false
+onboarded = false
+note = "Speech runtime, MiniCPM-o 4.5 adapter spike, legacy and deterministic fallback."
+
+[[repo]]
+path = "/home/ubuntu/jmcp-split/jmcp-deploy"
+name = "jmcp-deploy"
+github_slug = "neverhuman/jmcp-deploy"
+jeryu_slug = "jeryu/jmcp-deploy"
+profile = "ops"
+default_branch = "main"
+rollout_wave = 0
+has_jeryu_std = false
+onboarded = false
+note = "Split-family orchestration, launch scripts, env, health checks, Jeryu/GitHub wiring."
