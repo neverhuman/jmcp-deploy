@@ -27,7 +27,7 @@ JMCP defaults:
 
 - API bind: `127.0.0.1:18877`
 - API URL: `http://127.0.0.1:18877`
-- cockpit dev bind: `127.0.0.1:15873`
+- cockpit dev bind: `127.0.0.1:8080`
 
 Jeryu is optional. Its absence is degraded state, not a startup failure.
 

@@ -6,7 +6,7 @@
 # and the background release/deploy logs. Classifies each as running | stuck | errored | exited via
 # journald + log-tail heuristics, writes ~/.jeryu/process-observations.json (the cache the universe
 # board reads), and POSTs ProcessObservations to JMCP /process-observations on state CHANGE (deduped,
-# fail-open — works fully via the local cache when jmcpd is down/stale).
+# fail-open — works fully via the local cache when jmcpd is unavailable).
 #
 # usage: process-policer.sh [--once]    (no arg = loop forever; the systemd service runs it)
 set -uo pipefail
@@ -28,14 +28,14 @@ ERR_RE=re.compile(os.environ.get("POLICER_ERROR_REGEX", r"error\[|panicked|FAILE
 now=time.time()
 def sh(*a):
     try: return subprocess.run(a,capture_output=True,text=True,timeout=10).stdout
-    except Exception: return ""
+    except (OSError, subprocess.SubprocessError): return ""
 def is_active(u): return sh("systemctl","--user","is-active",u).strip()
 def last_line_ts(u):
     out=sh("systemctl","--user","show",u,"-p","ActiveEnterTimestamp","-p","ExecMainStartTimestamp")
     # journald last entry time
     j=sh("journalctl","--user","-u",u,"-n","1","-o","short-unix","--no-pager").strip().split()
     try: return float(j[0]) if j else None
-    except Exception: return None
+    except (IndexError, TypeError, ValueError): return None
 def recent_text(u,secs):
     return sh("journalctl","--user","-u",u,"--since",f"-{secs}s","-o","cat","--no-pager")
 
@@ -53,7 +53,7 @@ def journal(u):  # [(ts, msg)] most recent ~40 lines
     for l in sh("journalctl","--user","-u",u,"-n","40","-o","short-unix","--no-pager").splitlines():
         p=l.split(None,1)
         try: out.append((float(p[0]), p[1] if len(p)>1 else ""))
-        except Exception: pass
+        except (IndexError, TypeError, ValueError): pass
     return out
 
 # core + runner units (only ones that are active are worth policing)
@@ -86,13 +86,13 @@ for u in sorted(units):
 # 2) background release/deploy logs -> per-repo (owner__repo) signals
 for log in glob.glob(f"{STATE_DIR}/*/deploy.log")+glob.glob(f"{STATE_DIR}/*/*.release.log")+glob.glob(f"{STATE_DIR}/*/*.promote.log"):
     try: age=now-os.path.getmtime(log)
-    except Exception: continue
+    except OSError: continue
     if age>LONGRUN: continue   # only recently-active deploys
     key=os.path.basename(os.path.dirname(log))   # owner__repo
     try:
         with open(log,errors="ignore") as f:
             f.seek(max(0,os.path.getsize(log)-4000)); tail=f.read()
-    except Exception: tail=""
+    except OSError: tail=""
     if ERR_RE.search(tail):
         emit(key,"errored",False,"error-line","deploy")
     elif age<INTERVAL*3:

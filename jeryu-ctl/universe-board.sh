@@ -26,15 +26,15 @@ manifest_repos --rows 2>/dev/null > "$tmp/rows"
 
 # --- aggregate (rows via FILE arg; stdin is the heredoc script) ---
 python3 - "$JERYU_BASE" "$JERYU_GIT_ROOT" "$STORE" "$POBS" "$tmp/rows" > "$tmp/data.json" <<'PY'
-import sys, os, json, glob, subprocess, time, re, urllib.request, datetime
+import sys, os, json, glob, subprocess, time, re, urllib.error, urllib.request, datetime
 BASE, GITROOT, STORE, POBS, ROWS = sys.argv[1:6]
 def git(repo,*a):
     try: return subprocess.run(["git","-C",repo,*a],capture_output=True,text=True,timeout=10).stdout.strip()
-    except Exception: return ""
+    except (OSError, subprocess.SubprocessError): return ""
 def api(path):
     try:
         with urllib.request.urlopen(f"{BASE}{path}", timeout=8) as r: return json.load(r)
-    except Exception: return None
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError): return None
 def check_runs_all(owner,repo,sha):
     # the jeryu endpoint returns ALL the repo's check-runs UNFILTERED by sha — must paginate.
     items=[]; page=1
@@ -52,14 +52,14 @@ def parse_ts(s):
     s=s.rstrip("Z")
     if "." in s: h,fr=s.split(".",1); s=h+"."+fr[:6]
     try: return datetime.datetime.fromisoformat(s).replace(tzinfo=datetime.timezone.utc).timestamp()
-    except Exception: return None
+    except ValueError: return None
 now=time.time()
 pobs={}
 if os.path.isfile(POBS):
     try:
         j=json.load(open(POBS)); j=j if isinstance(j,list) else j.get("observations",[])
         for o in j: pobs[o.get("process_key","")]=o
-    except Exception: pass
+    except (OSError, json.JSONDecodeError, TypeError): pass
 rows=[]
 for line in open(ROWS):
     line=line.strip()
@@ -90,12 +90,12 @@ for line in open(ROWS):
             stages=[s for s in ("local","dev-canary","prod") if os.path.isfile(f"{STORE}/receipts/{key}@{bsha}-{s}.json")]
             last_bin={"sha":bsha[:12],"version":d.get("version",""),"stages":stages,"epoch":int(os.path.getmtime(rels[0]))}
             version=d.get("version")
-        except Exception: pass
+        except (OSError, json.JSONDecodeError, TypeError): pass
     if not version:
         sc=sorted(glob.glob(f"{STORE}/releases/{key}@*.version"), key=os.path.getmtime, reverse=True)
         if sc:
             try: version=open(sc[0]).read().strip()
-            except Exception: pass
+            except OSError: pass
     if not version and main:
         m=re.search(r'\[workspace\.package\][^\[]*?version\s*=\s*"([^"]+)"', git(bare,"show",f"{main}:Cargo.toml"), re.S)
         if m: version=m.group(1)

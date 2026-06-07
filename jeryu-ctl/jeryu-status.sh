@@ -39,7 +39,7 @@ jeryu_open_pr_count() {
   curl -fsS --max-time 10 "$JERYU_BASE/repos/$owner/$repo/pulls?state=open" 2>/dev/null | python3 -c '
 import sys, json
 try: d = json.load(sys.stdin)
-except Exception: print(0); sys.exit(0)
+except json.JSONDecodeError: print(0); sys.exit(0)
 arr = d if isinstance(d, list) else d.get("items", [])
 n = sum(1 for p in arr
         if p.get("state") == "open" and not p.get("draft")
@@ -63,7 +63,7 @@ import sys
 owner, repo, bare, lib, pulls_json = sys.argv[1:6]
 try:
     pulls = json.loads(pulls_json)
-except Exception:
+except (TypeError, json.JSONDecodeError):
     print("unknown")
     raise SystemExit
 
@@ -141,7 +141,7 @@ for stage in ("local", "dev-canary", "prod"):
         continue
     try:
         data = json.loads(path.read_text())
-    except Exception:
+    except (OSError, json.JSONDecodeError, TypeError):
         bad.append(f"{stage}:json")
         continue
     payload = data.get("payload") or {}
@@ -178,7 +178,7 @@ for ring in (1, 5, 25, 50, 100):
         continue
     try:
         data = json.loads(path.read_text())
-    except Exception:
+    except (OSError, json.JSONDecodeError, TypeError):
         bad.append(f"{ring}:json")
         continue
     if data.get("schema") != "jeryu-canary-v1":
@@ -191,7 +191,7 @@ for ring in (1, 5, 25, 50, 100):
         bad.append(f"{ring}:sha")
     try:
         samples = float(data.get("samples"))
-    except Exception:
+    except (TypeError, ValueError):
         samples = 0
     if samples <= 0:
         bad.append(f"{ring}:samples")
@@ -201,7 +201,7 @@ for ring in (1, 5, 25, 50, 100):
     try:
         high = int(alerts.get("high"))
         critical = int(alerts.get("critical"))
-    except Exception:
+    except (TypeError, ValueError, AttributeError):
         high = critical = -1
     if high != 0 or critical != 0:
         bad.append(f"{ring}:alerts")

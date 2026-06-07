@@ -13,7 +13,7 @@ working-copy paths, public GitHub slugs, local Jeryu slugs, profiles, default
 branches, and onboarding status.
 
 ```bash
-python3 ops/split/manifest.py --manifest repos.manifest.toml
+ops/split/manifest.sh --manifest repos.manifest.toml
 ```
 
 ## Health And Dry Run

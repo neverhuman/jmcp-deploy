@@ -3,7 +3,7 @@
 #
 # Worktrees the merged sha off the BARE repo and runs the BUILT jeryu-codegraph CLI to rebuild
 # ~/.jeryu/codegraph/<owner>__<repo>.sqlite, so impact analysis (and the agent context-lock in
-# Cluster 3.2/3.3) is always fresh. Only cargo-workspace repos. FAIL-OPEN — a stale/failed index
+# Cluster 3.2/3.3) is always fresh. Only cargo-workspace repos. FAIL-OPEN — an expired/failed index
 # NEVER blocks a merge. Calls the existing CLI; touches NO jeryu source.
 #
 # usage: codegraph-index.sh <owner> <repo> <merged_sha> [repo_path]

@@ -16,7 +16,7 @@ The audit-facing lane map is kept in `agent/proof-lanes.toml`. The test map in `
 - **Security:** Prove secret redaction, approval enforcement, adapter boundary checks, and replay side-effect safety.
 - **Operations:** Prove cold start, restart, database reuse, audit export, and degraded-mode behavior.
 - **Reproducibility:** Prove committed fixtures and generated zones are sufficient to reproduce claims locally.
-- **Rendered UX:** Prove the live cockpit UI and the `apps/web` proof host with Playwright screenshots and accessibility checks.
+- **Split UI delegation:** `jmcp-deploy` proves launch, health, smoke, and mirror orchestration. Browser UI proof belongs to the sibling `jmcp-web` repository.
 
 ## Control-Plane Proofs
 
@@ -46,7 +46,7 @@ Abort a lane as soon as one of these happens:
 - a command begins hitting an external service that was not declared in the lane recipe;
 - a replay or retry can duplicate durable side effects;
 - a proof requires manual intervention that cannot be captured as a receipt;
-- a budget or quota is about to be exceeded and there is no local fallback.
+- a budget or quota is about to be exceeded and there is no local degraded.
 
 ## Repair Receipts
 
@@ -76,8 +76,14 @@ The standard rerun commands are:
 - `just release-readiness`
 - `cargo test --workspace --all-targets --locked`
 - `npm --workspace @jmcp/cockpit run build`
-- `npm --prefix apps/web run build`
-- `npm --prefix apps/web run test:ux`
+
+## Agent-Friendly Exception Pattern
+
+- purpose: make failed deploy gates repairable without hidden context.
+- reason: each failure should name the lane, artifact, owner route, manifest path, and rerun command.
+- common fixes: rerun `just score`, rerun `just security`, rerun `bash ops/split/health.sh --offline`, repair `agent/test-map.json`, or update `repos.manifest.toml`.
+- docs_url: `docs/testing.md#repair-receipts`
+- repair_hint: use the failing finding path to choose the smallest `agent/test-map.json` command.
 
 ## Launch Gate Evidence
 

@@ -1,0 +1,11 @@
+[stack]
+id = "rust-ts-vite-react-postgres-bounded-python"
+version = "0.4.0"
+
+[deploy]
+owned_paths = ["ops/", "scripts/", "jeryu-ctl/", "repos.manifest.toml"]
+forbidden_ownership = ["product runtime logic", "durable approvals", "tool policy", "ledgers"]
+
+[secrets]
+token_sources = ["environment", "gh auth token"]
+forbidden_sources = ["repository text", "embedded token literals"]

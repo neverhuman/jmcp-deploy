@@ -48,17 +48,19 @@ ssh_host="${JERYU_GITHUB_SSH_HOST:-github-neverhuman}"
 ssh_url="${ssh_host}:${SLUG}.git"
 url=""
 auth_label=""
+token_header=()
 if git -C "$bare" ls-remote -q "$ssh_url" refs/heads/main >/dev/null 2>&1; then
   url="$ssh_url"
   auth_label="ssh"
 else
   tok="$(github_token)"
   [[ -n "$tok" ]] || { neutral "no github ssh access and no github token"; exit 0; }
-  url="https://x-access-token:${tok}@github.com/${SLUG}.git"
+  url="https://github.com/${SLUG}.git"
+  token_header=(-c "http.https://github.com/.extraheader=AUTHORIZATION: bearer ${tok}")
   auth_label="https-token"
 fi
 
-if ! git -C "$bare" fetch -q --no-tags "$url" +refs/heads/main:refs/jeryu-mirror/github-main 2>/dev/null; then
+if ! git -C "$bare" "${token_header[@]}" fetch -q --no-tags "$url" +refs/heads/main:refs/jeryu-mirror/github-main 2>/dev/null; then
   neutral "could not fetch github main for $SLUG via $auth_label"
   exit 0
 fi
@@ -85,9 +87,9 @@ if git -C "$bare" merge-base --is-ancestor "$gh_main" "$SHA" 2>/dev/null; then
   if [[ "$DRY_RUN" == "1" ]]; then
     exit 0
   fi
-  push_out="$(git -C "$bare" push "$url" "$SHA:refs/heads/main" 2>&1)"
+  push_out="$(git -C "$bare" "${token_header[@]}" push "$url" "$SHA:refs/heads/main" 2>&1)"
   push_rc=$?
-  printf '%s\n' "$push_out" | grep -vi 'x-access-token' | tail -5 >&2 || true
+  printf '%s\n' "$push_out" | tail -5 >&2 || true
   if [[ "$push_rc" -eq 0 ]]; then
     success "pushed exact Jeryu commit to github main"
   else
@@ -115,9 +117,9 @@ Jeryu-Commit: $SHA
 EOF
 )" || { neutral "could not create wrapper commit"; exit 0; }
 
-push_out="$(git -C "$bare" push "$url" "$wrapper:refs/heads/main" 2>&1)"
+push_out="$(git -C "$bare" "${token_header[@]}" push "$url" "$wrapper:refs/heads/main" 2>&1)"
 push_rc=$?
-printf '%s\n' "$push_out" | grep -vi 'x-access-token' | tail -5 >&2 || true
+printf '%s\n' "$push_out" | tail -5 >&2 || true
 if [[ "$push_rc" -eq 0 ]]; then
   success "pushed wrapper commit ${wrapper:0:12} to github main"
 else

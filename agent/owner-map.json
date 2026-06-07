@@ -1,0 +1,28 @@
+{
+  "owners": {
+    ".autonomy/": "agent",
+    ".editorconfig": "workspace",
+    ".env.example": "workspace",
+    ".github/": "ops",
+    ".gitignore": "workspace",
+    ".jeryu/": "ops",
+    ".npmrc": "workspace",
+    "AGENTS.md": "agent",
+    "CHANGELOG.md": "release",
+    "CLAUDE.md": "agent",
+    "GEMINI.md": "agent",
+    "Justfile": "workspace",
+    "README-jankurai-scaffold.md": "agent",
+    "README.md": "workspace",
+    "agent/": "agent",
+    "ci-fast-push.sh": "ops",
+    "docs/": "docs",
+    "gitleaks.toml": "ops",
+    "jeryu-ctl/": "ops",
+    "ops/": "ops",
+    "repos.manifest.toml": "ops",
+    "scripts/": "ops",
+    "tests/": "tests",
+    "tools/": "ops"
+  }
+}

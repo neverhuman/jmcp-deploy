@@ -40,7 +40,7 @@ process_repo(){
   mapfile -t HEADS < <(printf '%s' "$pulls" | python3 -c '
 import sys,json
 try: d=json.load(sys.stdin)
-except Exception: sys.exit(0)
+except json.JSONDecodeError: sys.exit(0)
 for p in (d if isinstance(d,list) else []):
     if p.get("state")!="open" or p.get("draft"): continue
     if (p.get("base") or {}).get("ref")!="main": continue

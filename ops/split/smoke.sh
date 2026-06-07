@@ -187,8 +187,7 @@ core_bin="$(cargo_target_dir "$CORE_REPO")/debug/jmcpd"
 step "building cockpit"
 (
   cd "$WEB_REPO"
-  VITE_JMCP_API_URL="$core_url" \
-    VITE_JMCP_BASE="/jmcp" \
+  VITE_JMCP_BASE="/jmcp" \
     VITE_ASR_BASE="/asr" \
     VITE_TTS_BASE="/tts" \
     VITE_LLM_BASE="/llm" \
@@ -224,7 +223,6 @@ start_service \
     VITE_ASR_TARGET="$talk_url" \
     VITE_TTS_TARGET="$talk_url" \
     VITE_LLM_TARGET="http://127.0.0.1:18902" \
-    VITE_JMCP_API_URL="$core_url" \
     VITE_JMCP_BASE="/jmcp" \
     VITE_ASR_BASE="/asr" \
     VITE_TTS_BASE="/tts" \

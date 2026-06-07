@@ -49,7 +49,7 @@ while True:
     try:
         with urllib.request.urlopen(url, timeout=10) as resp:
             data = json.load(resp)
-    except Exception:
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
         break
 
     if isinstance(data, list):
@@ -89,7 +89,7 @@ check_conclusion() {
 import sys, json
 sha, name = sys.argv[1], sys.argv[2]
 try: d = json.load(sys.stdin)
-except Exception: sys.exit(0)
+except json.JSONDecodeError: sys.exit(0)
 runs = [r for r in (d if isinstance(d, list) else d.get("check_runs", [])) if r.get("head_sha") == sha]
 runs.sort(key=lambda r: (r.get("completed_at") or r.get("started_at") or ""))
 latest = {}
@@ -105,7 +105,7 @@ ci_green() {
 import sys, json
 sha = sys.argv[1]
 try: d = json.load(sys.stdin)
-except Exception: sys.exit(1)
+except json.JSONDecodeError: sys.exit(1)
 runs = [r for r in (d if isinstance(d, list) else d.get("check_runs", [])) if r.get("head_sha") == sha]
 runs.sort(key=lambda r: (r.get("completed_at") or r.get("started_at") or ""))
 latest = {}
@@ -127,16 +127,10 @@ post_check() {
 }
 
 # Resolve a GitHub token for the offsite relay (neverhuman identity).
-# Prefer the LIVE gh-authenticated token; the .git-credentials-jeryu file holds a
-# stale gho_ token that github now rejects.
+# Prefer an explicit environment token, then the active gh-authenticated token.
 github_token() {
   if [[ -n "${GH_RELAY_TOKEN:-}" ]]; then printf '%s' "$GH_RELAY_TOKEN"; return; fi
   local t; t="$(gh auth token 2>/dev/null)"; [[ -n "$t" ]] && { printf '%s' "$t"; return; }
-  local f=/home/ubuntu/.git-credentials-jeryu tok
-  if [[ -r "$f" ]]; then
-    tok="$(grep -m1 'x-access-token:' "$f" 2>/dev/null | sed -E 's#https://x-access-token:([^@]+)@.*#\1#')"
-    [[ -n "$tok" ]] && printf '%s' "$tok"
-  fi
 }
 
 # Abort if a url.*.insteadOf rewrite could hijack github.com pushes to dead gitea.

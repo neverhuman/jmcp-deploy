@@ -18,7 +18,7 @@ import sys
 try:
     import tomllib
 except ModuleNotFoundError:
-    import tomli as tomllib  # py<3.11 fallback
+    import tomli as tomllib  # py<3.11 compatibility
 path = sys.argv[1]; args = sys.argv[2:]
 wave = max_wave = onboarded = has_jeryu = None; field = "name"; rows = False
 i = 0

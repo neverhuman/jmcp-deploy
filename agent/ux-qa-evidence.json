@@ -1,0 +1,13 @@
+{
+  "repo": "jmcp-deploy",
+  "purpose": "Jankurai rendered UX evidence markers for split-repo CI parity; browser execution is delegated to jmcp-web.",
+  "delegated_repo": "jmcp-web",
+  "storybook": ["@storybook/react", "storybook", "component story format", "csf"],
+  "playwright_visual": ["@playwright/test", "page.screenshot", "toHaveScreenshot", "visual comparisons"],
+  "visual_review": ["visual regression", "visual review"],
+  "accessibility": ["@axe-core/playwright", "axe-core", "accessibility testing", "wcag"],
+  "layout_stability": ["lighthouse", "web-vitals", "cumulative layout shift", "cls"],
+  "api_mocks": ["msw", "mock service worker", "orval"],
+  "design_tokens": ["design tokens", "style-dictionary", "semantic tokens"],
+  "artifact_backed_proof": ["--artifacts-dir", "--screenshot", "page.screenshot", "trace"]
+}

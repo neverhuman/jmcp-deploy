@@ -25,7 +25,7 @@ A repo with a fresh `.jankurai/repo-score.json` shows up `fresh` on the fleet bo
 - `jeryu-ctl/install-jankurai-hook.sh [--all|--repo R|--uninstall]` symlinks `hooks/jankurai-precommit.sh`
   into `.git/hooks/pre-commit` (untracked → no cap, no PR). It runs `jankurai diff-audit` (diff-scoped, ~5s
   warm) and BLOCKS only commits that introduce **new** hard findings or caps; cold/slow repos degrade to
-  advisory past `JANKURAI_HOOK_TIMEOUT` (60s). Bypass: `JANKURAI_SKIP_HOOKS=1` or `git commit --no-verify`.
+  advisory past `JANKURAI_HOOK_TIMEOUT` (60s). Emergency overrides require the repo's documented release exception path.
 
 ## Canonical landing model (do NOT push direct GitHub PRs)
 Tracked changes land through the loop: branch → push to jeryu `:8787` → `host-ci` (`jeryu/ci`) →

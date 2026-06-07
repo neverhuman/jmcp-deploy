@@ -2,7 +2,7 @@
 # jankurai pre-commit gate (Cluster 4.2) — blocks a commit that introduces jankurai hard findings or
 # new caps in the staged change (diff-scoped via `jankurai diff-audit`; unrelated WIP is not punished).
 # Warm repos audit in ~5s; a cold/slow repo degrades to ADVISORY (warn + allow) past the timeout so a
-# commit is never hung. Writes ONLY to a temp dir. Bypass: JANKURAI_SKIP_HOOKS=1 or git commit --no-verify.
+# commit is never hung. Writes ONLY to a temp dir.
 set -uo pipefail
 [[ "${JANKURAI_SKIP_HOOKS:-0}" == "1" ]] && exit 0
 command -v jankurai >/dev/null 2>&1 || exit 0
@@ -21,5 +21,5 @@ echo "" >&2
 echo "✗ jankurai gate BLOCKED this commit: hard findings or new caps in the staged change." >&2
 [[ -s "$out/diff-audit.md" ]] && { echo "  --- jankurai diff-audit ---" >&2; sed -n '1,22p' "$out/diff-audit.md" >&2; }
 [[ -s "$out/err" ]] && sed -n '1,6p' "$out/err" >&2
-echo "  → fix the findings, or bypass: JANKURAI_SKIP_HOOKS=1 git commit   (or: git commit --no-verify)" >&2
+echo "  fix the findings, then rerun the commit." >&2
 exit 1

@@ -25,7 +25,7 @@ default_branch = "main"
 rollout_wave = 0
 has_jeryu_std = true
 onboarded = true
-note = "Jarvis-style frontend, cockpit, JITUX card console, rendered UX."
+note = "Cockpit UI owned and proved inside jmcp-web."
 
 [[repo]]
 path = "/home/ubuntu/jmcp-split/jmcp-talk"

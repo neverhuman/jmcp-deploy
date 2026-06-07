@@ -52,7 +52,7 @@ dec="$("$WSVERSION_BIN" --root "$wt" decide --range "$range" --json 2>/dev/null 
 read -r FROM TO BUMP SKIP < <(printf '%s' "$dec" | python3 -c '
 import sys, json
 try: d = json.load(sys.stdin)
-except Exception: sys.exit(0)
+except json.JSONDecodeError: sys.exit(0)
 print(d.get("from",""), d.get("to",""), d.get("bump",""), str(d.get("skipped", False)).lower())
 ' 2>/dev/null)
 [[ -z "${TO:-}" || "${SKIP:-}" == "true" || "$TO" == "${FROM:-}" ]] && exit 0

@@ -75,7 +75,7 @@ for stage in stages:
         if not payload.get("rollback_target"):
             rollback_armed = False
         subjects.append(data.get("subject", f"{slug}@{sha}:{stage}"))
-    except Exception as exc:
+    except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
         errors.append(f"{stage}:{exc}")
     finally:
         latencies.append((time.perf_counter() - probe_start) * 1000.0)

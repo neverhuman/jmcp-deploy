@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import importlib.util
+import json
 import pathlib
 import subprocess
 import tempfile
@@ -9,12 +9,7 @@ import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "repos.manifest.toml"
-MANIFEST_PY = ROOT / "ops/split/manifest.py"
-
-spec = importlib.util.spec_from_file_location("manifest", MANIFEST_PY)
-manifest = importlib.util.module_from_spec(spec)
-assert spec.loader is not None
-spec.loader.exec_module(manifest)
+MANIFEST_SH = ROOT / "ops/split/manifest.sh"
 
 
 class ManifestTest(unittest.TestCase):
@@ -28,8 +23,19 @@ class ManifestTest(unittest.TestCase):
         )
         return path
 
+    def run_manifest(self, path: pathlib.Path, *extra: str) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            [str(MANIFEST_SH), "--manifest", str(path), *extra],
+            cwd=ROOT,
+            check=False,
+            text=True,
+            capture_output=True,
+        )
+
     def test_manifest_contains_onboarded_split_family(self) -> None:
-        data = manifest.load_manifest(MANIFEST)
+        result = self.run_manifest(MANIFEST, "--json")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        data = json.loads(result.stdout)
         repos = {repo["name"]: repo for repo in data["repo"]}
         self.assertEqual(
             set(repos),
@@ -43,11 +49,10 @@ class ManifestTest(unittest.TestCase):
     def test_manifest_rejects_not_onboarded_repo(self) -> None:
         path = self.write_manifest_variant("onboarded = true", "onboarded = false")
 
-        with self.assertRaisesRegex(
-            ValueError,
-            "jmcp-core must set onboarded=true",
-        ):
-            manifest.load_manifest(path)
+        result = self.run_manifest(path)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("jmcp-core must set onboarded=true", result.stderr)
 
     def test_manifest_rejects_repo_without_jeryu_standard(self) -> None:
         path = self.write_manifest_variant(
@@ -55,11 +60,10 @@ class ManifestTest(unittest.TestCase):
             "has_jeryu_std = false",
         )
 
-        with self.assertRaisesRegex(
-            ValueError,
-            "jmcp-core must set has_jeryu_std=true",
-        ):
-            manifest.load_manifest(path)
+        result = self.run_manifest(path)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("jmcp-core must set has_jeryu_std=true", result.stderr)
 
     def test_offline_health_skips_local_jeryu_dependency(self) -> None:
         result = subprocess.run(

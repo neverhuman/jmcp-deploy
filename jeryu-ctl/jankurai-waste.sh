@@ -21,7 +21,7 @@ for line in open(ROWS):
     sj=os.path.join(path,".jankurai","repo-score.json")
     if not os.path.isfile(sj): continue
     try: d=json.load(open(sj))
-    except Exception: continue
+    except (OSError, json.JSONDecodeError): continue
     cc=(d.get("copy_code") or {}).get("summary") or {}
     ta=d.get("tool_adoption") or {}
     miss=[ (m if isinstance(m,str) else (m.get("tool") or m.get("id") or "")) for m in (ta.get("missing") or []) ]

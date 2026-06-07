@@ -36,7 +36,7 @@ if [[ "$OFFLINE" == "1" && "$REQUIRE_JERYU" == "1" ]]; then
   exit 2
 fi
 
-python3 "$DEPLOY_DIR/ops/split/manifest.py" --manifest "$MANIFEST" >/dev/null
+"$DEPLOY_DIR/ops/split/manifest.sh" --manifest "$MANIFEST" >/dev/null
 
 if [[ "$OFFLINE" == "1" ]]; then
   printf 'split_manifest=ok mode=offline manifest=%s\n' "$MANIFEST"
@@ -62,7 +62,7 @@ while IFS='|' read -r name path github_slug jeryu_slug; do
     printf 'missing_jeryu_remote name=%s slug=%s\n' "$name" "$jeryu_slug" >&2
     fail=1
   fi
-done < <(python3 "$DEPLOY_DIR/ops/split/manifest.py" --manifest "$MANIFEST")
+done < <("$DEPLOY_DIR/ops/split/manifest.sh" --manifest "$MANIFEST")
 
 if curl -fsS --max-time 5 "$JERYU_BASE/health" >/dev/null 2>&1; then
   printf 'jeryu_api=ok base=%s\n' "$JERYU_BASE"

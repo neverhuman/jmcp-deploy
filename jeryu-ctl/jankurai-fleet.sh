@@ -26,10 +26,10 @@ import sys, os, json, glob, subprocess, time, re
 BASE,GITROOT,STORE,ROWS,MODE,ONLY,JBIN,TMP = sys.argv[1:9]
 def git(p,*a):
     try: return subprocess.run(["git","-C",p,*a],capture_output=True,text=True,timeout=12).stdout.strip()
-    except Exception: return ""
+    except (OSError, subprocess.SubprocessError): return ""
 def load(p):
     try: return json.load(open(p))
-    except Exception: return None
+    except (OSError, json.JSONDecodeError): return None
 now=int(time.time())
 repos=[]; errors=[]
 for line in open(ROWS):
@@ -63,7 +63,7 @@ for line in open(ROWS):
             else: errors.append({"repo":name,"message":(r.stderr or "score produced no json")[:200]})
         except subprocess.TimeoutExpired:
             errors.append({"repo":name,"message":"jankurai score timed out (240s)"})
-        except Exception as e:
+        except (OSError, subprocess.SubprocessError) as e:
             errors.append({"repo":name,"message":str(e)[:200]})
     dec=(sd or {}).get("decision") or {}
     score=(sd or {}).get("score"); raw=(sd or {}).get("raw_score")

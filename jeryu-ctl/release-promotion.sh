@@ -62,7 +62,7 @@ for stage in ("local", "dev-canary", "prod"):
         continue
     try:
         data = json.loads(path.read_text())
-    except Exception as exc:
+    except (OSError, json.JSONDecodeError) as exc:
         bad.append(f"{stage}:unreadable:{exc}")
         continue
     payload = data.get("payload") or {}

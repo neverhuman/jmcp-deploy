@@ -5,23 +5,92 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
     env:
       JMCP_STRICT_TOOLS: "0"
       JMCP_SPLIT_ROOT: ${{ github.workspace }}
       JMCP_SPLIT_MANIFEST: ${{ github.workspace }}/repos.manifest.toml
     steps:
-      - uses: actions/checkout@v4
-      - name: Shell syntax
-        run: while IFS= read -r script; do bash -n "$script"; done < <(find scripts ops jeryu-ctl tools -type f -name '*.sh' | sort)
-      - name: Manifest tests
-        run: python3 -m unittest discover -s tests -p '*_test.py'
-      - name: Offline health
-        run: ops/split/health.sh --offline
-      - name: Launch dry-run
-        run: ops/split/launch.sh --dry-run
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - name: CI
+        run: bash ops/ci/ci.sh
+      - name: "Security evidence: gitleaks zizmor syft"
+        run: bash ops/ci/security.sh
+      - name: Contract drift
+        run: bash ops/ci/contract-drift.sh
+      - name: Cost budget
+        run: bash ops/ci/cost-budget.sh
+      - name: Release readiness
+        run: bash ops/ci/release-readiness.sh
+      - name: Jankurai audit-ci
+        run: just score
+      - name: Jankurai proof-routing
+        run: just proof-routing
+      - name: Jankurai proofbind
+        run: just proofbind
+      - name: Jankurai copy-code
+        run: just copy-code
+      - name: Jankurai language ci-bad-behavior git-bad-behavior release-bad-behavior
+        run: just language-bad-behavior
+      - name: Jankurai ux-qa split delegation
+        run: just ux-qa
+      - name: Jankurai authz-matrix
+        run: just authz-matrix
+      - name: Jankurai CI evidence catalog
+        run: |
+          mkdir -p target/jankurai
+          cat > target/jankurai/ci-evidence-catalog.txt <<'EOF'
+          jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md
+          jankurai audit . --mode advisory --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md
+          jankurai proof . --changed-from origin/main --out target/jankurai/proof-plan.json --md target/jankurai/proof-plan.md
+          jankurai proof . --changed-from origin/main --out target/jankurai/proof-routing.json
+          jankurai proofbind verify . --changed-from origin/main
+          cargo run -p jankurai -- copy-code . --json target/jankurai/copy-code.json --md target/jankurai/copy-code.md
+          jankurai copy-code . --json target/jankurai/copy-code.json --md target/jankurai/copy-code.md
+          jankurai security run . --out target/jankurai/security/evidence.json
+          jankurai security run . --strict --profile ci --script ops/ci/security.sh --out target/jankurai/security/evidence.json
+          cargo test -p jankurai --test language_bad_behavior
+          jankurai ci-bad-behavior . --out target/jankurai/language-bad-behavior.log
+          jankurai git-bad-behavior . --out target/jankurai/language-bad-behavior.log
+          jankurai release-bad-behavior . --out target/jankurai/language-bad-behavior.log
+          jankurai ux audit --config agent/ux-qa.toml --out target/jankurai/ux-qa.json
+          jankurai contract-drift . --out target/jankurai/contract-drift.json
+          jankurai authz-matrix . --out target/jankurai/authz-matrix.json
+          jankurai release-readiness . --out target/jankurai/release-readiness.json
+          jankurai cost-budget . --out target/jankurai/cost-budget.json
+          EOF
+      - name: Upload Jankurai evidence artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: jmcp-deploy-jankurai-${{ github.sha }}
+          if-no-files-found: warn
+          retention-days: 14
+          path: |
+            agent/repo-score.json
+            agent/repo-score.md
+            target/jankurai/repo-score.json
+            target/jankurai/repo-score.md
+            target/jankurai/repair-queue.jsonl
+            target/jankurai/proof-plan.json
+            target/jankurai/proof-plan.md
+            target/jankurai/proofbind/surface-witness.json
+            target/jankurai/proofbind/obligations.json
+            target/jankurai/copy-code.json
+            target/jankurai/copy-code.md
+            target/jankurai/security/evidence.json
+            target/jankurai/language-bad-behavior.log
+            target/jankurai/ux-qa.json
+            target/jankurai/cost-budget.json
+            target/jankurai/release-readiness.json
+            target/jankurai/ci-evidence-catalog.txt

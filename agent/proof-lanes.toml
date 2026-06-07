@@ -129,20 +129,6 @@ required_claims = [
 
 [[lane]]
 evidence = [
-    "apps/web/",
-    "docs/screenshots/",
-    "agent/ux-qa.toml",
-]
-id = "rendered-ux"
-required_claims = [
-    "rendered UX proof host",
-    "Playwright screenshot capture",
-    "accessibility checks",
-    "reuse of the live cockpit UI",
-]
-
-[[lane]]
-evidence = [
     "docs/protocol-decisions.md",
     "agent/test-map.json",
 ]
@@ -193,6 +179,11 @@ purpose = "produce jankurai score artifacts"
 command = "just contract-drift"
 name = "contract-drift"
 purpose = "boundary manifest, generated-contract routing, and public API drift checks"
+
+[[lane]]
+command = "just ux-qa"
+name = "ux-qa"
+purpose = "prove deploy has no rendered web ownership and routes jmcp-web through the split manifest"
 
 [[lane]]
 command = "just security"

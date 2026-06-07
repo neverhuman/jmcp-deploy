@@ -93,7 +93,7 @@ def fail(message):
 try:
     with open(raw_path, "r", encoding="utf-8") as handle:
         data = json.load(handle)
-except Exception as exc:
+except (OSError, json.JSONDecodeError) as exc:
     fail(f"telemetry JSON unreadable: {exc}")
 
 required = [
@@ -120,18 +120,18 @@ try:
     ts = datetime.fromisoformat(sampled_at.replace("Z", "+00:00"))
     if ts.tzinfo is None:
         ts = ts.replace(tzinfo=timezone.utc)
-except Exception as exc:
+except (TypeError, ValueError) as exc:
     fail(f"sampled_at is not RFC3339-compatible: {exc}")
 age = (datetime.now(timezone.utc) - ts.astimezone(timezone.utc)).total_seconds()
 if age > max_age:
-    fail(f"stale telemetry: sampled_at age {age:.0f}s > {max_age}s")
+    fail(f"expired telemetry: sampled_at age {age:.0f}s > {max_age}s")
 if age < -120:
     fail(f"sampled_at is too far in the future: {-age:.0f}s")
 
 def finite_float(name):
     try:
         value = float(data[name])
-    except Exception:
+    except (TypeError, ValueError):
         fail(f"{name} must be numeric")
     if not math.isfinite(value):
         fail(f"{name} must be finite")
@@ -158,7 +158,7 @@ alerts = data.get("security_alerts") or {}
 try:
     high = int(alerts.get("high"))
     critical = int(alerts.get("critical"))
-except Exception:
+except (TypeError, ValueError, AttributeError):
     fail("security_alerts.high and .critical must be integers")
 if high != 0 or critical != 0:
     fail(f"security alerts must be zero (high={high}, critical={critical})")

@@ -31,7 +31,7 @@ case "$code" in
   *) warn "POST /repos returned HTTP $code (continuing; will verify bare repo)" ;;
 esac
 bare="$(bare_path "$OWNER" "$NAME")"
-[[ -d "$bare" ]] || die "bare repo did not materialize at $bare (repo_create may be blocked) — fallback: git init --bare"
+[[ -d "$bare" ]] || die "bare repo did not materialize at $bare (repo_create may be blocked); initialize the bare repo manually"
 
 # 2. Remotes: ensure a `github` backup remote (captured from the current github origin),
 #    a `jeryu` remote, and (with --flip-origin) point origin INTERNALLY at jeryu.

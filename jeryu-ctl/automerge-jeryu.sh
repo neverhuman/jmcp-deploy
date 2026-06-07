@@ -3,13 +3,13 @@
 # host poller). For each open PR into main on jeryu: require BOTH jeryu/ci green AND
 # jeryu/agent-review=success for the SAME head sha, and no opt-out label, then
 # advance main via server-side update-ref (the only automated path that moves jeryu main).
-# The legacy --relay path is manual-only; jeryu-poll uses --mirror-github instead.
+# The --relay path is manual-only; jeryu-poll uses --mirror-github instead.
 #
 # Usage:
 #   automerge-jeryu.sh <owner> <repo> [--relay <github_slug>] [--review]
 #     --review  run agent-review.sh first if the gate's agent check is missing
-#     --relay   manual legacy option: after merge, open a GitHub relay PR
-#               requires ALLOW_LEGACY_RELAY=1
+#     --relay   manual option: after merge, open a GitHub relay PR
+#               requires ALLOW_MANUAL_RELAY=1
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; . "$HERE/lib.sh"
 
@@ -24,8 +24,8 @@ esac; shift; done
 # Required CI check = the one host-ci.sh posts (host-native execution). jeryu's
 # in-process bridge check `ci/ci` is hermetic and ignored here.
 REQUIRED_CHECK="${REQUIRED_CHECK:-jeryu/ci}"
-if [[ -n "$RELAY_SLUG" && "${ALLOW_LEGACY_RELAY:-0}" != "1" ]]; then
-  die "--relay is manual-only; set ALLOW_LEGACY_RELAY=1 or use jeryu-poll.sh --mirror-github"
+if [[ -n "$RELAY_SLUG" && "${ALLOW_MANUAL_RELAY:-0}" != "1" ]]; then
+  die "--relay is manual-only; set ALLOW_MANUAL_RELAY=1 or use jeryu-poll.sh --mirror-github"
 fi
 
 bare="$(bare_path "$OWNER" "$REPO")"; [[ -d "$bare" ]] || die "no bare repo: $bare"
@@ -37,7 +37,7 @@ pulls="$(curl -fsS --max-time 10 "$JERYU_BASE/repos/$OWNER/$REPO/pulls?state=ope
 mapfile -t ROWS < <(printf '%s' "$pulls" | python3 -c '
 import sys, json
 try: d = json.load(sys.stdin)
-except Exception: sys.exit(0)
+except json.JSONDecodeError: sys.exit(0)  # empty/non-JSON body => no eligible PRs
 for p in (d if isinstance(d, list) else d.get("items", [])):
     if p.get("state") != "open" or p.get("draft"): continue
     base = (p.get("base") or {}).get("ref"); head = (p.get("head") or {}).get("ref")
@@ -73,7 +73,7 @@ for row in "${ROWS[@]}"; do
     curl -fsS --max-time 10 -X PUT "$JERYU_BASE/repos/$OWNER/$REPO/pulls/$num/merge" \
       -H 'content-type: application/json' -d '{"merge_method":"merge"}' >/dev/null 2>&1 || true
     ok "MERGED $OWNER/$REPO#$num -> main @ ${head_sha:0:12}"
-    [[ -n "$RELAY_SLUG" ]] && ALLOW_LEGACY_RELAY=1 "$HERE/relay-to-github.sh" "$OWNER" "$REPO" "$head_sha" "$RELAY_SLUG" --manual || true
+    [[ -n "$RELAY_SLUG" ]] && ALLOW_MANUAL_RELAY=1 "$HERE/relay-to-github.sh" "$OWNER" "$REPO" "$head_sha" "$RELAY_SLUG" --manual || true
     # Cluster 1A: live auto-versioning (opt-in via JERYU_AUTOVERSION=1). Advances main to the
     # [skip-version] bump commit + carries the gate forward; the deploy below signs the bumped
     # version. Fail-open (no-op for repos without a [workspace.package].version).

@@ -23,8 +23,8 @@ Run the local proof set in this order:
 7. `just release-readiness`
 8. `cargo test --workspace --all-targets --locked`
 9. `npm --workspace @jmcp/cockpit run build`
-10. `npm --prefix apps/web run build`
-11. `npm --prefix apps/web run test:ux`
+
+Sibling browser UI release evidence is produced by `jmcp-web`; this repo only validates split launch, health, smoke, and mirror orchestration.
 
 `just release-readiness` is the final release surface check. It validates that this doc, `docs/testing.md`, `docs/operations.md`, and `agent/cost-budget.toml` still describe the same local proof set and receipts.
 

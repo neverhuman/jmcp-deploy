@@ -39,6 +39,9 @@ health-offline:
 split-smoke:
     ops/split/smoke.sh
 
+ux-qa:
+    bash ops/ci/ux-qa.sh
+
 score: score-advisory
 
 score-advisory:
@@ -89,4 +92,4 @@ input-boundary:
 agent-tool-supply:
     jankurai audit . --mode advisory --json .jankurai/repo-score.json --md .jankurai/repo-score.md
 
-check: fast build test health-offline launch-dry-run security conformance contract-drift cost-budget release-readiness score
+check: fast build test health-offline launch-dry-run security conformance contract-drift cost-budget release-readiness ux-qa score

@@ -6,7 +6,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 api_bind="${JMCP_API_BIND:-127.0.0.1:18877}"
 api_url="${JMCP_API_URL:-http://127.0.0.1:18877}"
 cockpit_host="${JMCP_COCKPIT_HOST:-127.0.0.1}"
-cockpit_port="${JMCP_COCKPIT_PORT:-15873}"
+cockpit_port="${JMCP_COCKPIT_PORT:-8080}"
 protected_ports=(2224 8787 8799 8929 18787 18788 19800)
 failed=0
 

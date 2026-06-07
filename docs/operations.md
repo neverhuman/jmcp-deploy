@@ -6,7 +6,7 @@ JMCP V1 runs as a local production-shaped system. The operator should be able to
 
 ## Release Gate
 
-Operations and release use the same local proofs. A candidate is ready only when the fast, conformance, security, rendered UX, and workspace build lanes all pass and the advisory score baseline is non-regressing. See `docs/release.md`.
+Operations and release use the same local proofs. A candidate is ready only when the fast, conformance, security, deploy orchestration, and workspace build lanes all pass and the advisory score baseline is non-regressing. See `docs/release.md`.
 
 ## Cost Budgets
 

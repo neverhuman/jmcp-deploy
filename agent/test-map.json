@@ -1,92 +1,10 @@
 {
-  "lanes": [
-    {
-      "id": "unit",
-      "must_prove": [
-        "protocol envelope validation",
-        "event serialization round trips",
-        "approval state transitions",
-        "adapter error classification"
-      ],
-      "scope": "Pure Rust modules and React utility surfaces"
-    },
-    {
-      "id": "integration-local",
-      "must_prove": [
-        "cold start",
-        "SQLite migration application",
-        "event publish and replay",
-        "approval persistence",
-        "dashboard/TUI API contract compatibility"
-      ],
-      "scope": "Local process with embedded SQLite and in-process event bus"
-    },
-    {
-      "id": "protocol",
-      "must_prove": [
-        "schema acceptance for valid envelopes",
-        "schema rejection for malformed envelopes",
-        "correlation id propagation",
-        "idempotency key handling",
-        "transport profile invariants"
-      ],
-      "scope": "JCP/1.0.0 over JPCM"
-    },
-    {
-    "id": "security",
-    "must_prove": [
-      "no secret values in logs or audit exports",
-      "mutating operations require approval",
-      "adapters route all effects through policy.",
-      "replay cannot duplicate committed side effects"
-    ],
-      "scope": "Secrets, approvals, audit, and adapter boundaries"
-    },
-    {
-      "id": "reproducibility",
-      "must_prove": [
-        "documented commands work locally",
-        "fixtures are committed or generated from declared zones",
-        "tests do not depend on remote services by default",
-        "paper claims map to tests or design decisions"
-      ],
-      "scope": "Developer and CI-local parity"
-    }
-  ],
-  "minimum_bar": "CI-local parity with deterministic unit, integration, replay, protocol, security, and operations tests.",
-  "system": "JMCP",
+  "version": 1,
+  "workspace": "jmcp-deploy",
   "tests": {
-    "AGENTS.md": {
+    ".autonomy/": {
       "command": "just score",
-      "purpose": "verify root routing remains visible to the audit"
-    },
-    "AGENT_CHAT.md": {
-      "command": "just score",
-      "purpose": "verify governance chat remains routed"
-    },
-    "AGENT_WORK_PLAN.md": {
-      "command": "just score",
-      "purpose": "verify the work plan remains routed"
-    },
-    "README.md": {
-      "command": "just score",
-      "purpose": "verify the workspace readme remains routed"
-    },
-    ".agents/": {
-      "command": "just score",
-      "purpose": "verify generated agent scaffolding stays routed and reviewable"
-    },
-    ".artifacts/": {
-      "command": "just score",
-      "purpose": "verify generated artifacts remain outside the authored surface"
-    },
-    ".claude/": {
-      "command": "just score",
-      "purpose": "verify Claude-facing instruction scaffolding remains routed"
-    },
-    ".cursor/": {
-      "command": "just score",
-      "purpose": "verify cursor rules remain routed and reviewable"
+      "purpose": "verify autonomy policy remains routed"
     },
     ".editorconfig": {
       "command": "just fast",
@@ -96,263 +14,93 @@
       "command": "just fast",
       "purpose": "verify sample environment config remains routed"
     },
-    "telegram.env": {
-      "command": "just security",
-      "purpose": "verify Telegram environment config remains routed"
-    },
-    ".github/copilot-instructions.md": {
-      "command": "just score",
-      "purpose": "verify GitHub Copilot instructions remain reviewable"
-    },
-    ".github/instructions/": {
-      "command": "just score",
-      "purpose": "verify GitHub instruction bundles remain routed"
-    },
     ".github/workflows/": {
       "command": "just security",
-      "purpose": "verify GitHub workflow automation stays routed through the security lane"
+      "purpose": "verify workflow automation stays routed through the security lane"
     },
     ".gitignore": {
       "command": "just fast",
-      "purpose": "repository ignore policy"
+      "purpose": "verify repository ignore policy"
     },
     ".jeryu/": {
       "command": "just fast",
-      "purpose": "verify local Jeryu configuration stays routed"
+      "purpose": "verify local Jeryu metadata remains routed"
     },
     ".npmrc": {
       "command": "just fast",
-      "purpose": "verify npm configuration stays routed"
+      "purpose": "verify npm configuration remains routed"
     },
-    "README-jankurai-scaffold.md": {
-      "command": "jankurai doctor --fail-on critical",
-      "purpose": "verify scaffold marker does not hide missing control-plane files"
-    },
-    "Cargo.lock": {
-      "command": "just fast",
-      "purpose": "verify Cargo lockfile routing remains visible"
-    },
-    "Cargo.toml": {
-      "command": "just fast",
-      "purpose": "verify workspace manifest routing remains visible"
-    },
-    "gitleaks.toml": {
-      "command": "just security",
-      "purpose": "verify secret-scanning policy remains routed"
+    "AGENTS.md": {
+      "command": "just score",
+      "purpose": "verify root agent routing remains visible"
     },
     "CHANGELOG.md": {
-      "command": "just score",
-      "purpose": "verify the changelog remains part of the release proof surface"
+      "command": "just release-readiness",
+      "purpose": "verify changelog remains part of release evidence"
     },
     "CLAUDE.md": {
       "command": "just score",
       "purpose": "verify Claude-facing instructions remain routed"
     },
-    "Justfile": {
-      "command": "just fast",
-      "purpose": "verify the local build graph remains routed"
-    },
-    "agent/": {
-      "command": "just score",
-      "purpose": "verify manifests remain parseable and authoritative"
-    },
-    "agent/audit-policy.toml": {
-      "command": "just score",
-      "purpose": "verify structured runtime and control-plane event policy remains routed"
-    },
-    "agent/proof-lanes.toml": {
-      "command": "just score",
-      "purpose": "verify proof-lane coverage stays aligned with the control-plane proof surface"
-    },
     "GEMINI.md": {
       "command": "just score",
       "purpose": "verify Gemini-facing instructions remain routed"
     },
+    "Justfile": {
+      "command": "just fast",
+      "purpose": "verify local proof targets remain routed"
+    },
+    "README-jankurai-scaffold.md": {
+      "command": "just score",
+      "purpose": "verify Jankurai scaffold remains routed"
+    },
+    "README.md": {
+      "command": "just score",
+      "purpose": "verify README guidance remains routed"
+    },
+    "agent/": {
+      "command": "just score",
+      "purpose": "verify agent-readable manifests remain parseable"
+    },
+    "ci-fast-push.sh": {
+      "command": "just fast",
+      "purpose": "verify local fast-push helper remains shell-parseable"
+    },
     "docs/": {
-      "command": "just score",
-      "purpose": "verify agent-readable documentation remains routed"
+      "command": "just release-readiness",
+      "purpose": "verify documentation remains aligned with release proof"
     },
-    "docs/agent-native-standard.md": {
-      "command": "just score",
-      "purpose": "verify the agent-native standard remains routed"
-    },
-    "docs/architecture.md": {
-      "command": "just score",
-      "purpose": "verify architecture claims remain routed"
-    },
-    "docs/operations.md": {
-      "command": "just score",
-      "purpose": "verify operations guidance remains routed"
-    },
-    "docs/testing.md": {
-      "command": "just score",
-      "purpose": "verify testing guidance and adversarial fixture coverage remain routed"
-    },
-    "docs/release.md": {
-      "command": "just score",
-      "purpose": "verify release gate guidance remains routed"
-    },
-    "docs/architecture/README.md": {
-      "command": "just score",
-      "purpose": "verify architecture documentation stays routed"
-    },
-    "docs/decisions/README.md": {
-      "command": "just score",
-      "purpose": "verify decision records remain routed"
-    },
-    "docs/ide-integrations.md": {
-      "command": "just score",
-      "purpose": "verify IDE integration guidance remains routed"
-    },
-    "agent/coverage-sources.toml": {
-      "command": "jankurai coverage audit . --config agent/coverage-sources.toml --json target/jankurai/coverage/coverage-audit.json --md target/jankurai/coverage/coverage-audit.md && just score",
-      "purpose": "verify coverage evidence source routing and score import"
-    },
-    "agent/zyal/": {
-      "command": "just score",
-      "purpose": "verify canonical ZYAL runbooks stay under agent/zyal and only use the .zyal extension"
-    },
-    "apps/": {
-      "command": "just fast",
-      "purpose": "verify app surfaces remain routed through the audit"
-    },
-    "apps/web/": {
-      "command": "just ux-qa",
-      "purpose": "verify the rendered UX proof host and accessibility checks"
-    },
-    "packages/ux-qa/": {
-      "command": "just ux-qa",
-      "purpose": "verify the local Jankurai UX QA verifier and rendered evidence receipts"
-    },
-    "package-lock.json": {
-      "command": "just fast",
-      "purpose": "verify the npm lockfile stays routed"
-    },
-    "package.json": {
-      "command": "just fast",
-      "purpose": "verify the npm manifest stays routed"
-    },
-    "rust-toolchain.toml": {
-      "command": "just fast",
-      "purpose": "verify the pinned Rust toolchain stays routed"
-    },
-    "schemas/jcp/1.0.0/jcp.schema.json": {
-      "command": "just contract-drift",
-      "purpose": "verify the JCP schema remains routed"
-    },
-    "schemas/jpcm/1.0.0/jpcm.schema.json": {
-      "command": "just contract-drift",
-      "purpose": "verify the JPCM schema remains routed"
-    },
-    "schemas/repair-queue.schema.json": {
-      "command": "just fast-json",
-      "purpose": "verify the repair queue receipt schema remains parseable"
-    },
-    "scripts/ci-doctor.sh": {
-      "command": "just fast",
-      "purpose": "verify CI doctor script routing"
-    },
-    "scripts/ci-local.sh": {
-      "command": "just fast",
-      "purpose": "verify CI local parity script routing"
-    },
-    "scripts/dev/stop-jmcp-dev.sh": {
-      "command": "just fast",
-      "purpose": "verify dev-stop script routing"
-    },
-    "scripts/verify-jmcp-env.sh": {
-      "command": "just fast",
-      "purpose": "verify environment verification script routing"
-    },
-    "contracts/": {
-      "command": "jankurai audit . --mode advisory --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
-      "purpose": "advisory contract drift scan until project-specific contract checks exist"
-    },
-    "paper/jmcp-v1-architecture-security-reproducibility.tex": {
-      "command": "just score",
-      "purpose": "verify the final paper source remains routed"
-    },
-    "python/ai-service/AGENTS.md": {
-      "command": "just score",
-      "purpose": "verify the Python service guidance remains routed"
-    },
-    "contracts/events/": {
-      "command": "just contract-drift",
-      "purpose": "verify event contract sources stay in the declared surface"
-    },
-    "agent/repo-score-baseline.json": {
-      "command": "just score",
-      "purpose": "verify the committed score baseline stays aligned with audit policy"
-    },
-    "crates/": {
-      "command": "just fast",
-      "purpose": "verify Rust behavior and audit checks"
-    },
-    "crates/jmcp-conformance/src/lib.rs": {
-      "command": "just conformance",
-      "purpose": "verify deterministic conformance fixtures remain routable"
-    },
-    "crates/jmcp-conformance/tests/jcp_v1.rs": {
-      "command": "just conformance",
-      "purpose": "verify JCP v1 conformance fixtures and adversarial cases remain routable"
-    },
-    "deny.toml": {
+    "gitleaks.toml": {
       "command": "just security",
-      "purpose": "verify dependency policy remains routed"
+      "purpose": "verify secret-scanning policy remains routed"
     },
-    "crates/jankurai/src/audit/coverage.rs": {
-      "command": "jankurai coverage audit . --config agent/coverage-sources.toml --json target/jankurai/coverage/coverage-audit.json --md target/jankurai/coverage/coverage-audit.md && just score",
-      "purpose": "verify coverage parsers and evidence normalization"
-    },
-    "crates/jankurai/src/commands/coverage.rs": {
-      "command": "jankurai coverage audit . --config agent/coverage-sources.toml --json target/jankurai/coverage/coverage-audit.json --md target/jankurai/coverage/coverage-audit.md && just score",
-      "purpose": "verify coverage audit command behavior"
-    },
-    "crates/jankurai/tests/fixtures/coverage/": {
-      "command": "jankurai coverage audit . --config agent/coverage-sources.toml --json target/jankurai/coverage/coverage-audit.json --md target/jankurai/coverage/coverage-audit.md",
-      "purpose": "verify coverage parser fixture contracts"
-    },
-    "db/": {
-      "command": "jankurai doctor --fail-on critical",
-      "purpose": "advisory database boundary health check"
-    },
-    "db/constraints/": {
-      "command": "jankurai doctor --fail-on critical",
-      "purpose": "advisory constraint-lane health check until DB proof exists"
-    },
-    "db/migrations/": {
-      "command": "jankurai doctor --fail-on critical",
-      "purpose": "advisory control-plane health check until migration tests exist"
-    },
-    "docs/architecture/": {
-      "command": "jankurai audit . --mode advisory --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
-      "purpose": "verify architecture docs remain visible to the audit"
-    },
-    "docs/decisions/": {
-      "command": "jankurai audit . --mode advisory --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
-      "purpose": "verify decision records remain visible to the audit"
-    },
-    "docs/COVERAGE_*.md": {
-      "command": "just score",
-      "purpose": "verify coverage evidence docs remain routed"
-    },
-    "examples/perfect-web-api-db/backend/src/background_job.rs": {
+    "jeryu-ctl/": {
       "command": "just fast",
-      "purpose": "run proofs for background‑job cell"
+      "purpose": "verify Jeryu control scripts remain shell-parseable"
     },
     "ops/": {
       "command": "just fast",
-      "purpose": "verify ops surfaces remain visible to the audit"
+      "purpose": "verify local CI and split orchestration scripts"
     },
-    "schemas/coverage-*.schema.json": {
-      "command": "just score",
-      "purpose": "verify coverage evidence schemas and fixtures"
+    "ops/split/": {
+      "command": "just health-offline && just launch-dry-run",
+      "purpose": "verify offline split launch and health checks"
+    },
+    "repos.manifest.toml": {
+      "command": "just contract-drift",
+      "purpose": "verify split repository manifest wiring"
+    },
+    "scripts/": {
+      "command": "just fast",
+      "purpose": "verify environment scripts remain shell-parseable"
+    },
+    "tests/": {
+      "command": "just test",
+      "purpose": "verify manifest and launch unit tests"
     },
     "tools/": {
       "command": "just fast",
-      "purpose": "verify Rust behavior and audit checks"
+      "purpose": "verify local tool hooks remain shell-parseable"
     }
-  },
-  "version": 1,
-  "workspace": "jankurai"
+  }
 }
